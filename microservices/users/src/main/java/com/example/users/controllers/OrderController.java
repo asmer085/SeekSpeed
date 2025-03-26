@@ -1,12 +1,11 @@
 package com.example.users.controllers;
 
 import com.example.users.entity.Orders;
-import com.example.users.repository.OrderRepository;
+import com.example.users.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -14,41 +13,30 @@ import java.util.UUID;
 public class OrderController {
 
     @Autowired
-    private OrderRepository orderRepository;
+    private OrderService orderService;
 
     @GetMapping("/all")
     public @ResponseBody Iterable<Orders> getAllOrders() {
-        return orderRepository.findAll();
+        return orderService.getAllOrders();
     }
 
     @GetMapping("/{orderId}")
     public @ResponseBody Orders getOrderById(@PathVariable UUID orderId) {
-        return orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        return orderService.getOrderById(orderId);
     }
 
     @PostMapping("/add")
     public @ResponseBody Orders createOrder(@RequestBody Orders order) {
-        return orderRepository.save(order);
+        return orderService.createOrder(order);
     }
 
     @PutMapping("/{orderId}")
-    public @ResponseBody ResponseEntity<Orders> updateOrders(@PathVariable UUID orderId, @RequestBody Orders updatedOrder) {
-        return orderRepository.findById(orderId)
-                .map(order -> {
-                    order.setEquipmentId(updatedOrder.getEquipmentId());
-                    order.setUserId(updatedOrder.getUserId());
-                    return ResponseEntity.ok(orderRepository.save(order));
-                }).orElseGet(() -> ResponseEntity.notFound().build());
+    public @ResponseBody ResponseEntity<Orders> updateOrder(@PathVariable UUID orderId, @RequestBody Orders updatedOrder) {
+        return orderService.updateOrder(orderId, updatedOrder);
     }
 
     @DeleteMapping("/{orderId}")
     public @ResponseBody ResponseEntity<Object> deleteOrder(@PathVariable UUID orderId) {
-        return orderRepository.findById(orderId)
-                .map(order -> {
-                    orderRepository.delete(order);
-                    return ResponseEntity.ok().build();
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return orderService.deleteOrder(orderId);
     }
-
 }
