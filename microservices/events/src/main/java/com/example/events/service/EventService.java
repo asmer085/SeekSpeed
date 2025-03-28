@@ -2,6 +2,7 @@ package com.example.events.service;
 
 import com.example.events.dto.EventDTO;
 import com.example.events.entity.Event;
+import com.example.events.exception.ResourceNotFoundException;
 import com.example.events.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,14 +37,22 @@ public class EventService {
 
     public Event getEventById(UUID eventId) {
         return eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + eventId));
     }
 
     public List<Event> getEventsByOrganizerId(UUID organizerId) {
-        return eventRepository.findByOrganizerID(organizerId);
+        List<Event> events = eventRepository.findByOrganizerID(organizerId);
+        if (events.isEmpty()) {
+            throw new ResourceNotFoundException("No events found for organizer: " + organizerId);
+        }
+        return events;
     }
 
     public List<Event> getEventsByCategory(String category) {
-        return eventRepository.findByCategory(category);
+        List<Event> events = eventRepository.findByCategory(category);
+        if (events.isEmpty()) {
+            throw new ResourceNotFoundException("No events found in category: " + category);
+        }
+        return events;
     }
 }

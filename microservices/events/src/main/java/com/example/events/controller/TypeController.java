@@ -3,6 +3,7 @@ package com.example.events.controller;
 import com.example.events.dto.TypeDTO;
 import com.example.events.entity.Type;
 import com.example.events.service.TypeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ public class TypeController {
     private final TypeService typeService;
 
     @PostMapping
-    public Type createType(@RequestBody TypeDTO typeDTO) {
+    public Type createType(@Valid @RequestBody TypeDTO typeDTO) {
         return typeService.createType(typeDTO);
     }
 

@@ -3,6 +3,7 @@ package com.example.events.service;
 import com.example.events.dto.TypeDTO;
 import com.example.events.entity.Event;
 import com.example.events.entity.Type;
+import com.example.events.exception.ResourceNotFoundException;
 import com.example.events.repository.EventRepository;
 import com.example.events.repository.TypeRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class TypeService {
         type.setResults(typeDTO.getResults());
 
         Event event = eventRepository.findById(typeDTO.getEventId())
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + typeDTO.getEventId()));
         type.setEvent(event);
 
         return typeRepository.save(type);
@@ -39,7 +40,7 @@ public class TypeService {
 
     public List<Type> getTypesByEventId(UUID eventId) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + eventId));
         return typeRepository.findByEvent(event);
     }
 }

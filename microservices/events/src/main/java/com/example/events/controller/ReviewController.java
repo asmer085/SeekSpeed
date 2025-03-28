@@ -3,6 +3,7 @@ package com.example.events.controller;
 import com.example.events.dto.ReviewDTO;
 import com.example.events.entity.Review;
 import com.example.events.service.ReviewService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    public Review createReview(@RequestBody ReviewDTO reviewDTO) {
+    public Review createReview(@Valid @RequestBody ReviewDTO reviewDTO) {
         return reviewService.createReview(reviewDTO);
     }
 
