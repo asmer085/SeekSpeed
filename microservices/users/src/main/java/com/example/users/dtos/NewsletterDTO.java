@@ -1,16 +1,14 @@
-package com.example.users.entity;
+package com.example.users.dtos;
 
-import jakarta.persistence.*;
+import com.example.users.entity.Users;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import java.util.UUID;
 
-@Entity
-public class Newsletter {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class NewsletterDTO {
     @NotBlank(message = "Title is required")
     @Size(min = 5, max = 100, message = "Title must be between 5 and 100 characters")
     private String title;
@@ -18,14 +16,10 @@ public class Newsletter {
     @NotBlank(message = "Description is required")
     @Size(min = 10, max = 1000, message = "Description must be between 10 and 1000 characters")
     private String description;
-
-    @ManyToOne
+    private UUID userId;
+    /*@ManyToOne
     @JoinColumn(name = "user_id")
-    private Users user;
-
-    public UUID getId() { return id; }
-
-    public void setId(UUID id) { this.id = id; }
+    private Users user;*/
 
     public String getTitle() { return title; }
 
@@ -35,7 +29,11 @@ public class Newsletter {
 
     public void setDescription(String description) { this.description = description; }
 
-    public Users getUser() { return user; }
+    public UUID getUserId() { return userId; }
 
-    public void setUser(Users user) { this.user = user; }
+    public void setUserId(UUID userId) { this.userId = userId; }
+
+    /*public Users getUser() { return user; }
+
+    public void setUser(Users user) { this.user = user; }*/
 }

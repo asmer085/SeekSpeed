@@ -1,6 +1,8 @@
 package com.example.users.services;
 
+import com.example.users.dtos.UserDTO;
 import com.example.users.entity.Users;
+import com.example.users.mappers.UserMapper;
 import com.example.users.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,17 +16,22 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserMapper userMapper;
+
     public Iterable<Users> getAllUsers() {
         return userRepository.findAll();
     }
 
     public Users getUserById(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User with id " + userId + " not found"));
+                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
     }
 
-    public Users createUser(Users user) {
-        return userRepository.save(user);
+    public UserDTO createUser(UserDTO userDTO) {
+        Users user = userMapper.userDTOToUsers(userDTO);
+        Users savedUser = userRepository.save(user);
+        return userMapper.usersToUserDTO(savedUser);
     }
 
     public ResponseEntity<Users> updateUser(UUID userId, Users updatedUser) {
@@ -55,4 +62,10 @@ public class UserService {
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
-}
+
+    public static class UserNotFoundException extends RuntimeException {
+        public UserNotFoundException(String message) {
+            super(message);
+        }
+    }
+}  

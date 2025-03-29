@@ -1,6 +1,8 @@
 package com.example.users.services;
 
+import com.example.users.dtos.StatisticsDTO;
 import com.example.users.entity.Statistics;
+import com.example.users.mappers.StatisticsMapper;
 import com.example.users.repository.StatisticsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,17 +17,28 @@ public class StatisticsService {
     @Autowired
     private StatisticsRepository statisticsRepository;
 
+    @Autowired
+    private StatisticsMapper statisticsMapper;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private TypeService typeService;
+
     public Iterable<Statistics> getAllStatistics() {
         return statisticsRepository.findAll();
     }
 
     public Statistics getStatisticsById(UUID statisticId) {
         return statisticsRepository.findById(statisticId)
-                .orElseThrow(() -> new RuntimeException("Statistics with id " + statisticId + " not found"));
+                .orElseThrow(() -> new StatisticsNotFoundException("Statistics with id " + statisticId + " not found"));
     }
 
-    public Statistics addStatistics(Statistics statistics) {
-        return statisticsRepository.save(statistics);
+    public StatisticsDTO addStatistics(StatisticsDTO statisticsDTO) {
+        Statistics stat = statisticsMapper.statisticsDTOToStatistics(statisticsDTO, userService, typeService);
+        Statistics savedStat = statisticsRepository.save(stat);
+        return statisticsMapper.statisticsToStatisticsDTO(savedStat);
     }
 
     public ResponseEntity<Statistics> updateStatistics(UUID statisticId, Statistics updatedStatistics) {
@@ -52,5 +65,11 @@ public class StatisticsService {
     public ResponseEntity<List<Statistics>> getStatisticsByUserId(UUID userId) {
         List<Statistics> userStatistics = statisticsRepository.findByUserId(userId);
         return userStatistics.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(userStatistics);
+    }
+
+    public static class StatisticsNotFoundException extends RuntimeException {
+        public StatisticsNotFoundException(String message) {
+            super(message);
+        }
     }
 }

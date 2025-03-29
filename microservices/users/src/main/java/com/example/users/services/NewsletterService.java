@@ -1,6 +1,9 @@
 package com.example.users.services;
 
+import com.example.users.dtos.NewsletterDTO;
 import com.example.users.entity.Newsletter;
+import com.example.users.entity.Users;
+import com.example.users.mappers.NewsletterMapper;
 import com.example.users.repository.NewsletterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,18 +17,27 @@ public class NewsletterService {
     @Autowired
     private NewsletterRepository newsletterRepository;
 
+    @Autowired
+    private NewsletterMapper newsletterMapper;
+
+    @Autowired
+    private UserService userService;
+
     public Iterable<Newsletter> getAllNewsletters() {
         return newsletterRepository.findAll();
     }
 
     public Newsletter getNewsletterById(UUID newsletterId) {
         return newsletterRepository.findById(newsletterId)
-                .orElseThrow(() -> new RuntimeException("Newsletter with id " + newsletterId + " not found"));
+                .orElseThrow(() -> new NewsletterNotFoundException("Newsletter with id " + newsletterId + " not found"));
     }
 
-    public Newsletter addNewsletter(Newsletter newsletter) {
-        return newsletterRepository.save(newsletter);
+    public NewsletterDTO addNewsletter(NewsletterDTO newsletterDTO) {
+        Newsletter news = newsletterMapper.newsletterDTOToNewsletter(newsletterDTO, userService);
+        Newsletter savedNews = newsletterRepository.save(news);
+        return newsletterMapper.newsletterToNewsletterDTO(savedNews);
     }
+
 
     public ResponseEntity<Newsletter> updateNewsletter(UUID newsletterId, Newsletter updatedNewsletter) {
         return newsletterRepository.findById(newsletterId)
@@ -45,5 +57,11 @@ public class NewsletterService {
                     return ResponseEntity.ok().build();
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    public static class NewsletterNotFoundException extends RuntimeException {
+        public NewsletterNotFoundException(String message) {
+            super(message);
+        }
     }
 }

@@ -1,17 +1,12 @@
-package com.example.users.entity;
+package com.example.users.dtos;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import java.util.UUID;
 
-@Entity
-public class Type {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
+public class TypeDTO {
     @NotBlank(message = "Distance is required")
     @Size(max = 100, message = "Distance cannot be longer than 100 characters")
     @Column()
@@ -23,10 +18,6 @@ public class Type {
 
     @Column()
     private UUID eventUuid;
-
-    public UUID getId() { return id; }
-
-    public void setId(UUID id) { this.id = id; }
 
     public String getDistance() { return distance; }
 

@@ -1,15 +1,15 @@
-package com.example.users.entity;
+package com.example.users.dtos;
 
-import jakarta.persistence.*;
+import com.example.users.entity.Type;
+import com.example.users.entity.Users;
+import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.PositiveOrZero;
 
 import java.util.UUID;
 
-@Entity
-public class Statistics {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class StatisticsDTO {
 
     @PositiveOrZero(message = "Average pace must be positive or zero")
     @Column()
@@ -23,17 +23,16 @@ public class Statistics {
     @Column()
     private Double totalTime;
 
-    @ManyToOne
+    private UUID userId;
+    private UUID typeId;
+
+    /*@ManyToOne
     @JoinColumn(name = "user_id")
     private Users user;
 
     @ManyToOne
     @JoinColumn(name = "type_id")
-    private Type type;
-
-    public UUID getId() { return id; }
-
-    public void setId(UUID id) { this.id = id; }
+    private Type type;*/
 
     public Double getAveragePace() { return averagePace; }
 
@@ -47,11 +46,11 @@ public class Statistics {
 
     public void setTotalTime(Double totalTime) { this.totalTime = totalTime; }
 
-    public Users getUser() { return user; }
+    public UUID getUserId() { return userId; }
 
-    public void setUser(Users user) { this.user = user; }
+    public void setUserId(UUID userId) { this.userId = userId; }
 
-    public Type getType() { return type; }
+    public UUID getTypeId() { return typeId; }
 
-    public void setType(Type type) { this.type = type; }
+    public void setTypeId(UUID typeId) { this.typeId = typeId; }
 }

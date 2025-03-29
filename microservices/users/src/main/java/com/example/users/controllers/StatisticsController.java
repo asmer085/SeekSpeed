@@ -1,7 +1,10 @@
 package com.example.users.controllers;
 
+import com.example.users.dtos.StatisticsDTO;
 import com.example.users.entity.Statistics;
 import com.example.users.services.StatisticsService;
+import com.example.users.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,17 +25,25 @@ public class StatisticsController {
     }
 
     @GetMapping("/{statisticId}")
-    public @ResponseBody Statistics getStatisticsById(@PathVariable UUID statisticId) {
-        return statisticsService.getStatisticsById(statisticId);
+    public ResponseEntity<Statistics> getStatisticsById(@PathVariable UUID statisticId) {
+        try {
+            Statistics stat = statisticsService.getStatisticsById(statisticId);
+            return ResponseEntity.ok(stat);
+        } catch (StatisticsService.StatisticsNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/add")
-    public @ResponseBody Statistics addStatistics(@RequestBody Statistics statistics) {
-        return statisticsService.addStatistics(statistics);
+    public ResponseEntity<StatisticsDTO> addStatistics(@Valid @RequestBody StatisticsDTO statisticsDTO) {
+        StatisticsDTO createdStats = statisticsService.addStatistics(statisticsDTO);
+        return ResponseEntity.ok(createdStats);
     }
 
     @PutMapping("/{statisticId}")
-    public @ResponseBody ResponseEntity<Statistics> updateStatistics(@PathVariable UUID statisticId, @RequestBody Statistics updatedStatistics) {
+    public ResponseEntity<Statistics> updateStatistics(
+            @PathVariable UUID statisticId,
+            @Valid @RequestBody Statistics updatedStatistics) {
         return statisticsService.updateStatistics(statisticId, updatedStatistics);
     }
 
@@ -44,5 +55,10 @@ public class StatisticsController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Statistics>> getStatisticsByUserId(@PathVariable UUID userId) {
         return statisticsService.getStatisticsByUserId(userId);
+    }
+
+    @ExceptionHandler(StatisticsService.StatisticsNotFoundException.class)
+    public ResponseEntity<Object> handleStatisticsNotFound(StatisticsService.StatisticsNotFoundException ex) {
+        return ResponseEntity.notFound().build();
     }
 }

@@ -1,6 +1,8 @@
 package com.example.users.services;
 
+import com.example.users.dtos.EquipmentDTO;
 import com.example.users.entity.Equipment;
+import com.example.users.mappers.EquipmentMapper;
 import com.example.users.repository.EquipmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,17 +16,22 @@ public class EquipmentService {
     @Autowired
     private EquipmentRepository equipmentRepository;
 
+    @Autowired
+    private EquipmentMapper equipmentMapper;
+
     public Iterable<Equipment> getAllEquipment() {
         return equipmentRepository.findAll();
     }
 
     public Equipment getEquipmentById(UUID equipmentId) {
         return equipmentRepository.findById(equipmentId)
-                .orElseThrow(() -> new RuntimeException("Equipment with id " + equipmentId + " not found"));
+                .orElseThrow(() -> new EquipmentNotFoundException("Equipment with id " + equipmentId + " not found"));
     }
 
-    public Equipment createEquipment(Equipment equipment) {
-        return equipmentRepository.save(equipment);
+    public EquipmentDTO createEquipment(EquipmentDTO equipmentDTO) {
+        Equipment equipment = equipmentMapper.equipmentDTOToEquipment(equipmentDTO);
+        Equipment savedEquipment = equipmentRepository.save(equipment);
+        return equipmentMapper.equipmentToEquipmentDTO(savedEquipment);
     }
 
     public ResponseEntity<Equipment> updateEquipment(UUID equipmentId, Equipment updatedEquipment) {
@@ -46,5 +53,11 @@ public class EquipmentService {
                     return ResponseEntity.ok().build();
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    public static class EquipmentNotFoundException extends RuntimeException {
+        public EquipmentNotFoundException(String message) {
+            super(message);
+        }
     }
 }

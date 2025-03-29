@@ -1,7 +1,9 @@
 package com.example.users.controllers;
 
+import com.example.users.dtos.OrdersDTO;
 import com.example.users.entity.Orders;
 import com.example.users.services.OrderService;
+import com.example.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,13 +23,18 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}")
-    public @ResponseBody Orders getOrderById(@PathVariable UUID orderId) {
-        return orderService.getOrderById(orderId);
+    public ResponseEntity<Orders> getOrderById(@PathVariable UUID orderId) {
+        try {
+            Orders order = orderService.getOrderById(orderId);
+            return ResponseEntity.ok(order);
+        } catch (OrderService.OrderNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/add")
-    public @ResponseBody Orders createOrder(@RequestBody Orders order) {
-        return orderService.createOrder(order);
+    public @ResponseBody OrdersDTO createOrder(@RequestBody OrdersDTO orderDTO) {
+        return orderService.createOrder(orderDTO);
     }
 
     @PutMapping("/{orderId}")
@@ -39,4 +46,10 @@ public class OrderController {
     public @ResponseBody ResponseEntity<Object> deleteOrder(@PathVariable UUID orderId) {
         return orderService.deleteOrder(orderId);
     }
+
+    @ExceptionHandler(OrderService.OrderNotFoundException.class)
+    public ResponseEntity<Object> handleOrderNotFound(OrderService.OrderNotFoundException ex) {
+        return ResponseEntity.notFound().build();
+    }
+
 }
