@@ -16,6 +16,11 @@ public class UserDTO {
     @Email(message = "Invalid email format")
     private String emailAddress;
 
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]+$", message = "Password must contain at least one letter and one number")
+    private String password;
+
     private String role;
 
     private String dateOfBirth;
@@ -30,6 +35,8 @@ public class UserDTO {
     private String organisationFile;
 
     private String country;
+
+    private String picture;
 
     // Getters and setters
     public String getFirstName() {
@@ -54,6 +61,14 @@ public class UserDTO {
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getRole() {
@@ -102,5 +117,13 @@ public class UserDTO {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String pic) {
+        this.picture= pic;
     }
 }

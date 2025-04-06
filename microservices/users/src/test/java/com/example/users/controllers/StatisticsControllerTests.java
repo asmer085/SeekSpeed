@@ -123,7 +123,7 @@ class StatisticsControllerTests {
         updatedStatistic.setBestPace(4.30);
         updatedStatistic.setTotalTime(3500.0);
 
-        given(statisticsService.updateStatistics(eq(testStatisticId), any(Statistics.class)))
+        given(statisticsService.updateStatistics(eq(testStatisticId), any(StatisticsDTO.class)))
                 .willReturn(ResponseEntity.ok(updatedStatistic));
 
         // Act & Assert
@@ -139,7 +139,7 @@ class StatisticsControllerTests {
     @Test
     void updateStatistics_NonExistingStatistic_ShouldReturnNotFound() throws Exception {
         // Arrange
-        given(statisticsService.updateStatistics(eq(testStatisticId), any(Statistics.class)))
+        given(statisticsService.updateStatistics(eq(testStatisticId), any(StatisticsDTO.class)))
                 .willReturn(ResponseEntity.notFound().build());
 
         // Act & Assert
@@ -195,5 +195,44 @@ class StatisticsControllerTests {
         // Act & Assert
         mockMvc.perform(get("/statistics/user/{userId}", testUserId))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void patchUpdateStatistics_ValidPatch_ShouldReturnUpdatedStatistics() throws Exception {
+        // Arrange
+        String patchJson = "[{\"op\":\"replace\",\"path\":\"/averagePace\",\"value\":6.0}]";
+
+        Statistics patchedStatistic = new Statistics();
+        patchedStatistic.setId(testStatisticId);
+        patchedStatistic.setAveragePace(6.0);
+        patchedStatistic.setBestPace(4.45);
+        patchedStatistic.setTotalTime(3600.0);
+
+        given(statisticsService.applyPatchToStatistics(any(), eq(testStatisticId))).willReturn(patchedStatistic);
+
+        // Act & Assert
+        mockMvc.perform(patch("/statistics/{statisticId}", testStatisticId)
+                        .contentType("application/json-patch+json")
+                        .content(patchJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.averagePace").value(6.0))
+                .andExpect(jsonPath("$.bestPace").value(4.45))
+                .andExpect(jsonPath("$.totalTime").value(3600.0));
+    }
+
+    @Test
+    void patchUpdateStatistics_InvalidPatch_ShouldReturnBadRequest() throws Exception {
+        // Arrange
+        String invalidPatchJson = "[{\"op\":\"replace\",\"path\":\"/averagePace\",\"value\":-1.0}]";
+
+        given(statisticsService.applyPatchToStatistics(any(), eq(testStatisticId)))
+                .willThrow(new RuntimeException("Validation failed: Average pace must be positive or zero"));
+
+        // Act & Assert
+        mockMvc.perform(patch("/statistics/{statisticId}", testStatisticId)
+                        .contentType("application/json-patch+json")
+                        .content(invalidPatchJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Validation failed: Average pace must be positive or zero"));
     }
 }

@@ -4,6 +4,7 @@ import com.example.users.dtos.StatisticsDTO;
 import com.example.users.entity.Statistics;
 import com.example.users.services.StatisticsService;
 import com.example.users.services.UserService;
+import com.github.fge.jsonpatch.JsonPatch;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -41,10 +42,18 @@ public class StatisticsController {
     }
 
     @PutMapping("/{statisticId}")
-    public ResponseEntity<Statistics> updateStatistics(
-            @PathVariable UUID statisticId,
-            @Valid @RequestBody Statistics updatedStatistics) {
-        return statisticsService.updateStatistics(statisticId, updatedStatistics);
+    public ResponseEntity<Statistics> updateStatistics(@PathVariable UUID statisticId, @Valid @RequestBody StatisticsDTO updatedStatisticsDTO) {
+        return statisticsService.updateStatistics(statisticId, updatedStatisticsDTO);
+    }
+
+    @PatchMapping("/{statisticId}")
+    public ResponseEntity<?> patchUpdateStatistics(@PathVariable UUID statisticId, @RequestBody JsonPatch patch) {
+        try {
+            Statistics updatedStatistics = statisticsService.applyPatchToStatistics(patch, statisticId);
+            return ResponseEntity.ok(updatedStatistics);
+        }  catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{statisticId}")

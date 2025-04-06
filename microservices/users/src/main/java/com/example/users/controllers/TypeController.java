@@ -4,6 +4,7 @@ import com.example.users.dtos.TypeDTO;
 import com.example.users.entity.Type;
 import com.example.users.services.TypeService;
 import com.example.users.services.UserService;
+import com.github.fge.jsonpatch.JsonPatch;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,12 +40,19 @@ public class TypeController {
         return ResponseEntity.ok(createdType);
     }
 
-
     @PutMapping("/{typeId}")
-    public ResponseEntity<Type> updateType(
-            @PathVariable UUID typeId,
-            @Valid @RequestBody Type updatedType) {
-        return typeService.updateType(typeId, updatedType);
+    public ResponseEntity<Type> updateType(@PathVariable UUID typeId, @Valid @RequestBody TypeDTO updatedTypeDTO) {
+        return typeService.updateType(typeId, updatedTypeDTO);
+    }
+
+    @PatchMapping("/{typeId}")
+    public ResponseEntity<?> patchUpdateType(@PathVariable UUID typeId, @RequestBody JsonPatch patch) {
+        try {
+            Type updatedType = typeService.applyPatchToType(patch, typeId);
+            return ResponseEntity.ok(updatedType);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{typeId}")

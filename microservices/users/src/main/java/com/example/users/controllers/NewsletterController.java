@@ -4,6 +4,7 @@ import com.example.users.dtos.NewsletterDTO;
 import com.example.users.entity.Newsletter;
 import com.example.users.services.NewsletterService;
 import com.example.users.services.UserService;
+import com.github.fge.jsonpatch.JsonPatch;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -40,10 +41,18 @@ public class NewsletterController {
     }
 
     @PutMapping("/{newsletterId}")
-    public ResponseEntity<Newsletter> updateNewsletter(
-            @PathVariable UUID newsletterId,
-            @Valid @RequestBody Newsletter updatedNewsletter) {
-        return newsletterService.updateNewsletter(newsletterId, updatedNewsletter);
+    public ResponseEntity<Newsletter> updateNewsletter(@PathVariable UUID newsletterId, @Valid @RequestBody NewsletterDTO updatedNewsletterDTO) {
+        return newsletterService.updateNewsletter(newsletterId, updatedNewsletterDTO);
+    }
+
+    @PatchMapping("/{newsletterId}")
+    public ResponseEntity<?> patchUpdateNewsletter(@PathVariable UUID newsletterId, @RequestBody JsonPatch patch) {
+         try {
+             Newsletter updatedNews = newsletterService.applyPatchToNewsletter(patch, newsletterId);
+             return ResponseEntity.ok(updatedNews);
+         } catch (RuntimeException e) {
+             return ResponseEntity.badRequest().body(e.getMessage());
+         }
     }
 
     @DeleteMapping("/{newsletterId}")

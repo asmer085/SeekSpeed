@@ -4,6 +4,7 @@ import com.example.users.dtos.EquipmentDTO;
 import com.example.users.entity.Equipment;
 import com.example.users.services.EquipmentService;
 import com.example.users.services.UserService;
+import com.github.fge.jsonpatch.JsonPatch;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -40,10 +41,18 @@ public class EquipmentController {
     }
 
     @PutMapping("/{equipmentId}")
-    public ResponseEntity<Equipment> updateEquipment(
-            @PathVariable UUID equipmentId,
-            @Valid @RequestBody Equipment updatedEquipment) {
-        return equipmentService.updateEquipment(equipmentId, updatedEquipment);
+    public ResponseEntity<Equipment> updateEquipment(@PathVariable UUID equipmentId, @Valid @RequestBody EquipmentDTO updatedEquipmentDTO) {
+        return equipmentService.updateEquipment(equipmentId, updatedEquipmentDTO);
+    }
+
+    @PatchMapping("/{equipmentId}")
+    public ResponseEntity<?> patchUpdateEquipment(@PathVariable UUID equipmentId, @RequestBody JsonPatch patch) {
+        try {
+            Equipment updatedEquipment = equipmentService.applyPatchToEquipment(patch, equipmentId);
+            return ResponseEntity.ok(updatedEquipment);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{equipmentId}")

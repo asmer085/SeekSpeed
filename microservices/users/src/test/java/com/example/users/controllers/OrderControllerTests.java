@@ -119,7 +119,7 @@ class OrderControllerTests {
         updatedOrder.setUserId(testUserId);
         updatedOrder.setEquipmentId(newEquipmentId);
 
-        given(orderService.updateOrder(eq(testOrderId), any(Orders.class)))
+        given(orderService.updateOrder(eq(testOrderId), any(OrdersDTO.class)))
                 .willReturn(ResponseEntity.ok(updatedOrder));
 
         // Act & Assert
@@ -134,7 +134,7 @@ class OrderControllerTests {
     @Test
     void updateOrder_NonExistingOrder_ShouldReturnNotFound() throws Exception {
         // Arrange
-        given(orderService.updateOrder(eq(testOrderId), any(Orders.class)))
+        given(orderService.updateOrder(eq(testOrderId), any(OrdersDTO.class)))
                 .willReturn(ResponseEntity.notFound().build());
 
         // Act & Assert
@@ -164,5 +164,42 @@ class OrderControllerTests {
         // Act & Assert
         mockMvc.perform(delete("/orders/{orderId}", testOrderId))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void patchUpdateOrder_ValidPatch_ShouldReturnUpdatedOrder() throws Exception {
+        // Arrange
+        String patchJson = "[{\"op\":\"replace\",\"path\":\"/userId\",\"value\":\"" + testUserId + "\"}]";
+
+        Orders patchedOrder = new Orders();
+        patchedOrder.setId(testOrderId);
+        patchedOrder.setUserId(testUserId);
+        patchedOrder.setEquipmentId(testEquipmentId);
+
+        given(orderService.applyPatchToOrder(any(), eq(testOrderId))).willReturn(patchedOrder);
+
+        // Act & Assert
+        mockMvc.perform(patch("/orders/{orderId}", testOrderId)
+                        .contentType("application/json-patch+json")
+                        .content(patchJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(testUserId.toString()))
+                .andExpect(jsonPath("$.equipmentId").value(testEquipmentId.toString()));
+    }
+
+    @Test
+    void patchUpdateOrder_InvalidPatch_ShouldReturnBadRequest() throws Exception {
+        // Arrange
+        String invalidPatchJson = "[{\"op\":\"replace\",\"path\":\"/userId\",\"value\":\"invalid-uuid\"}]";
+
+        given(orderService.applyPatchToOrder(any(), eq(testOrderId)))
+                .willThrow(new RuntimeException("Validation failed: Invalid UUID format"));
+
+        // Act & Assert
+        mockMvc.perform(patch("/orders/{orderId}", testOrderId)
+                        .contentType("application/json-patch+json")
+                        .content(invalidPatchJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Validation failed: Invalid UUID format"));
     }
 }

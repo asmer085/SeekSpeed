@@ -114,7 +114,7 @@ class TypeControllerTests {
         updatedType.setDistance("5km");
         updatedType.setResults("Top 5");
 
-        given(typeService.updateType(eq(testTypeId), any(Type.class)))
+        given(typeService.updateType(eq(testTypeId), any(TypeDTO.class)))
                 .willReturn(ResponseEntity.ok(updatedType));
 
         // Act & Assert
@@ -129,7 +129,7 @@ class TypeControllerTests {
     @Test
     void updateType_NonExistingType_ShouldReturnNotFound() throws Exception {
         // Arrange
-        given(typeService.updateType(eq(testTypeId), any(Type.class)))
+        given(typeService.updateType(eq(testTypeId), any(TypeDTO.class)))
                 .willReturn(ResponseEntity.notFound().build());
 
         // Act & Assert
@@ -159,5 +159,42 @@ class TypeControllerTests {
         // Act & Assert
         mockMvc.perform(delete("/type/{typeId}", testTypeId))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void patchUpdateType_ValidPatch_ShouldReturnUpdatedType() throws Exception {
+        // Arrange
+        String patchJson = "[{\"op\":\"replace\",\"path\":\"/distance\",\"value\":\"5km\"}]";
+
+        Type patchedType = new Type();
+        patchedType.setId(testTypeId);
+        patchedType.setDistance("5km");
+        patchedType.setResults("Top 3");
+
+        given(typeService.applyPatchToType(any(), eq(testTypeId))).willReturn(patchedType);
+
+        // Act & Assert
+        mockMvc.perform(patch("/type/{typeId}", testTypeId)
+                        .contentType("application/json-patch+json")
+                        .content(patchJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.distance").value("5km"))
+                .andExpect(jsonPath("$.results").value("Top 3"));
+    }
+
+    @Test
+    void patchUpdateType_InvalidPatch_ShouldReturnBadRequest() throws Exception {
+        // Arrange
+        String invalidPatchJson = "[{\"op\":\"replace\",\"path\":\"/distance\",\"value\":\"\"}]";
+
+        given(typeService.applyPatchToType(any(), eq(testTypeId)))
+                .willThrow(new RuntimeException("Validation failed: Distance is required"));
+
+        // Act & Assert
+        mockMvc.perform(patch("/type/{typeId}", testTypeId)
+                        .contentType("application/json-patch+json")
+                        .content(invalidPatchJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Validation failed: Distance is required"));
     }
 }

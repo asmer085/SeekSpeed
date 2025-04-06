@@ -122,7 +122,7 @@ class NewsletterControllerTests {
         updatedNewsletter.setTitle("Updated Monthly Update");
         updatedNewsletter.setDescription("Updated news and updates");
 
-        given(newsletterService.updateNewsletter(eq(testNewsletterId), any(Newsletter.class)))
+        given(newsletterService.updateNewsletter(eq(testNewsletterId), any(NewsletterDTO.class)))
                 .willReturn(ResponseEntity.ok(updatedNewsletter));
 
         // Act & Assert
@@ -137,7 +137,7 @@ class NewsletterControllerTests {
     @Test
     void updateNewsletter_NonExistingNewsletter_ShouldReturnNotFound() throws Exception {
         // Arrange
-        given(newsletterService.updateNewsletter(eq(testNewsletterId), any(Newsletter.class)))
+        given(newsletterService.updateNewsletter(eq(testNewsletterId), any(NewsletterDTO.class)))
                 .willReturn(ResponseEntity.notFound().build());
 
         // Act & Assert
@@ -167,5 +167,43 @@ class NewsletterControllerTests {
         // Act & Assert
         mockMvc.perform(delete("/newsletter/{newsletterId}", testNewsletterId))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void patchUpdateNewsletter_ValidPatch_ShouldReturnUpdatedNewsletter() throws Exception {
+        // Arrange
+        String patchJson = "[{\"op\":\"replace\",\"path\":\"/title\",\"value\":\"New Title\"}]";
+
+        Newsletter patchedNewsletter = new Newsletter();
+        patchedNewsletter.setId(UUID.randomUUID());
+        patchedNewsletter.setTitle("New Title");
+        patchedNewsletter.setDescription("Existing description");
+
+        given(newsletterService.applyPatchToNewsletter(any(), any(UUID.class)))
+                .willReturn(patchedNewsletter);
+
+        // Act & Assert
+        mockMvc.perform(patch("/newsletter/{newsletterId}", UUID.randomUUID())
+                        .contentType("application/json-patch+json")
+                        .content(patchJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("New Title"))
+                .andExpect(jsonPath("$.description").value("Existing description"));
+    }
+
+    @Test
+    void patchUpdateNewsletter_InvalidPatch_ShouldReturnBadRequest() throws Exception {
+        // Arrange
+        String invalidPatchJson = "[{\"op\":\"replace\",\"path\":\"/title\",\"value\":\"\"}]"; // Empty title
+
+        given(newsletterService.applyPatchToNewsletter(any(), any(UUID.class)))
+                .willThrow(new RuntimeException("Validation failed: Title is required"));
+
+        // Act & Assert
+        mockMvc.perform(patch("/newsletter/{newsletterId}", UUID.randomUUID())
+                        .contentType("application/json-patch+json")
+                        .content(invalidPatchJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Validation failed: Title is required"));
     }
 }

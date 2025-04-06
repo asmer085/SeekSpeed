@@ -5,8 +5,8 @@ import jakarta.persistence.Column;
 import java.util.UUID;
 
 public class OrdersDTO {
+
     private UUID equipmentId;
-    @Column()
     private UUID userId;
 
 

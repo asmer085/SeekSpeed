@@ -114,7 +114,7 @@ class EquipmentControllerTests {
         updatedEquipment.setName("Updated Treadmill");
         updatedEquipment.setQuantity(15);
 
-        given(equipmentService.updateEquipment(eq(testEquipmentId), any(Equipment.class)))
+        given(equipmentService.updateEquipment(eq(testEquipmentId), any(EquipmentDTO.class)))
                 .willReturn(ResponseEntity.ok(updatedEquipment));
 
         // Act & Assert
@@ -129,7 +129,7 @@ class EquipmentControllerTests {
     @Test
     void updateEquipment_NonExistingEquipment_ShouldReturnNotFound() throws Exception {
         // Arrange
-        given(equipmentService.updateEquipment(eq(testEquipmentId), any(Equipment.class)))
+        given(equipmentService.updateEquipment(eq(testEquipmentId), any(EquipmentDTO.class)))
                 .willReturn(ResponseEntity.notFound().build());
 
         // Act & Assert
@@ -159,5 +159,43 @@ class EquipmentControllerTests {
         // Act & Assert
         mockMvc.perform(delete("/equipment/{equipmentId}", testEquipmentId))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void patchUpdateEquipment_ValidPatch_ShouldReturnUpdatedEquipment() throws Exception {
+        // Arrange
+        String patchJson = "[{\"op\":\"replace\",\"path\":\"/name\",\"value\":\"New Equipment Name\"}]";
+
+        Equipment patchedEquipment = new Equipment();
+        patchedEquipment.setId(UUID.randomUUID());
+        patchedEquipment.setName("New Equipment Name");
+        patchedEquipment.setQuantity(10);
+
+        given(equipmentService.applyPatchToEquipment(any(), any(UUID.class)))
+                .willReturn(patchedEquipment);
+
+        // Act & Assert
+        mockMvc.perform(patch("/equipment/{equipmentId}", UUID.randomUUID())
+                        .contentType("application/json-patch+json")
+                        .content(patchJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("New Equipment Name"))
+                .andExpect(jsonPath("$.quantity").value(10));
+    }
+
+    @Test
+    void patchUpdateEquipment_InvalidPatch_ShouldReturnBadRequest() throws Exception {
+        // Arrange
+        String invalidPatchJson = "[{\"op\":\"replace\",\"path\":\"/quantity\",\"value\":-5}]"; // Negative quantity
+
+        given(equipmentService.applyPatchToEquipment(any(), any(UUID.class)))
+                .willThrow(new RuntimeException("Validation failed: Quantity cannot be negative"));
+
+        // Act & Assert
+        mockMvc.perform(patch("/equipment/{equipmentId}", UUID.randomUUID())
+                        .contentType("application/json-patch+json")
+                        .content(invalidPatchJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Validation failed: Quantity cannot be negative"));
     }
 }

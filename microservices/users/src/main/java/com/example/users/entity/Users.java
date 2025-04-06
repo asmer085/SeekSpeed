@@ -89,7 +89,7 @@ public class Users {
 
     public String getTShirtSize() { return tShirtSize; }
 
-    public void settShirtSize(String tShirtSize) { this.tShirtSize = tShirtSize; }
+    public void setTShirtSize(String tShirtSize) { this.tShirtSize = tShirtSize; }
 
     public String getOrganisationFile() { return organisationFile; }
 

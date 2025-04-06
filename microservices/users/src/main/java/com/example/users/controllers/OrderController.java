@@ -4,6 +4,7 @@ import com.example.users.dtos.OrdersDTO;
 import com.example.users.entity.Orders;
 import com.example.users.services.OrderService;
 import com.example.users.services.UserService;
+import com.github.fge.jsonpatch.JsonPatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,8 +39,18 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}")
-    public @ResponseBody ResponseEntity<Orders> updateOrder(@PathVariable UUID orderId, @RequestBody Orders updatedOrder) {
-        return orderService.updateOrder(orderId, updatedOrder);
+    public @ResponseBody ResponseEntity<Orders> updateOrder(@PathVariable UUID orderId, @RequestBody OrdersDTO updatedOrderDTO) {
+        return orderService.updateOrder(orderId, updatedOrderDTO);
+    }
+
+    @PatchMapping("/{orderId}")
+    public @ResponseBody ResponseEntity<?> patchUpdateOrder(@PathVariable UUID orderId, @RequestBody JsonPatch patch) {
+        try {
+            Orders updatedOrder = orderService.applyPatchToOrder(patch, orderId);
+            return ResponseEntity.ok(updatedOrder);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{orderId}")
