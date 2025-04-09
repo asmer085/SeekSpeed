@@ -1,0 +1,13 @@
+com\example\users\services\StatisticsServiceTests.class
+com\example\users\UsersApplicationTests.class
+com\example\users\controllers\EquipmentControllerTests.class
+com\example\users\controllers\NewsletterControllerTests.class
+com\example\users\services\TypeServiceTests.class
+com\example\users\services\EquipmentServiceTests.class
+com\example\users\services\OrderServiceTests.class
+com\example\users\services\UserServiceTests.class
+com\example\users\controllers\TypeControllerTests.class
+com\example\users\controllers\UserControllerTests.class
+com\example\users\services\NewsletterServiceTests.class
+com\example\users\controllers\OrderControllerTests.class
+com\example\users\controllers\StatisticsControllerTests.class
