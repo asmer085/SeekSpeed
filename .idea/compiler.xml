@@ -8,14 +8,12 @@
         <outputRelativeToContentRoot value="true" />
         <module name="eureka-payments" />
         <module name="eureka-events" />
-        <module name="events" />
+        <module name="eureka-server" />
         <module name="eureka-users" />
+        <module name="events" />
+        <module name="users" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="eureka-server" target="17" />
-      <module name="users" target="17" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
