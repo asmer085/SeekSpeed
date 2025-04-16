@@ -27,10 +27,10 @@ public class HibStatisticsService {
         this.newsletterRepository = newsletterRepository;
     }
 
-    public void checkNPlusOneProblemForStatistics(UUID statId) {
+    public void checkNPlusOneProblemForStatistics() {
         int queryCountBefore = getQueryExecutionCount();
 
-        List<Statistics> stats = statisticsRepository.findByUserId(statId);
+        List<Statistics> stats = statisticsRepository.findAll();
         for (Statistics stat : stats) {
             System.out.println(stat.getUser().getFirstName());
         }
@@ -46,12 +46,13 @@ public class HibStatisticsService {
         }
     }
 
-    public void checkNPlusOneProblemForNewsletter(UUID newsId) {
+    public void checkNPlusOneProblemForNewsletter() {
         int queryCountBefore = getQueryExecutionCount();
 
-        newsletterRepository.findById(newsId).ifPresent(newsletter -> {
+        List<Newsletter> news = newsletterRepository.findAll();
+        for (Newsletter newsletter : news) {
             System.out.println(newsletter.getUser().getFirstName());
-        });
+        }
 
         int queryCountAfter = getQueryExecutionCount();
         int queryCount = queryCountAfter - queryCountBefore;

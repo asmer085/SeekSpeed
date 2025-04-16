@@ -13,13 +13,13 @@ public class HibStatisticsController {
     @Autowired
     private HibStatisticsService hibStatisticsService;
 
-    @GetMapping("/test/statistics/{statId}")
-    public void testStatistics(@PathVariable UUID statId) {
-        hibStatisticsService.checkNPlusOneProblemForStatistics(statId);
+    @GetMapping("/test/statistics/")
+    public void testStatistics() {
+        hibStatisticsService.checkNPlusOneProblemForStatistics();
     }
 
     @GetMapping("/test/newsletter/{newsId}")
-    public void testNewsletter(@PathVariable UUID newsId) {
-        hibStatisticsService.checkNPlusOneProblemForNewsletter(newsId);
+    public void testNewsletter() {
+        hibStatisticsService.checkNPlusOneProblemForNewsletter();
     }
 }
