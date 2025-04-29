@@ -30,4 +30,15 @@ public class TypeController {
     public List<Type> getTypesByEventId(@PathVariable UUID eventId) {
         return typeService.getTypesByEventId(eventId);
     }
+
+    @PutMapping("/batch")
+    public List<Type> updateTypes(@RequestBody List<TypeDTO> typeDTOs) {
+        return typeService.updateTypes(typeDTOs);
+    }
+
+    @GetMapping("/byDistance")
+    public List<Type> getTypesByDistance(@RequestParam UUID eventId, @RequestParam double minDistance) {
+        return typeService.getTypesByEventIdAndMinDistance(eventId, minDistance);
+    }
+
 }

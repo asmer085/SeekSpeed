@@ -3,6 +3,7 @@ package com.example.events.controller;
 import com.example.events.dto.EventDTO;
 import com.example.events.entity.Event;
 import com.example.events.service.EventService;
+import com.github.fge.jsonpatch.JsonPatch;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -39,5 +40,10 @@ public class EventController {
     @GetMapping("/category/{category}")
     public List<Event> getEventsByCategory(@PathVariable String category) {
         return eventService.getEventsByCategory(category);
+    }
+
+    @PatchMapping(path = "/{eventId}", consumes = "application/json-patch+json")
+    public Event patchEvent(@PathVariable UUID eventId, @RequestBody JsonPatch patch) {
+        return eventService.updateEventPatch(eventId, patch);
     }
 }

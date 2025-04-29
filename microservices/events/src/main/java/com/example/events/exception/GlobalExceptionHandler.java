@@ -8,7 +8,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +34,11 @@ public class GlobalExceptionHandler {
         response.setPath(request.getRequestURI());
 
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(InvalidPatchException.class)
+    public ResponseEntity<String> handleInvalidPatch(InvalidPatchException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
     // Handle custom not found exceptions
@@ -64,4 +68,5 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.internalServerError().body(response);
     }
+
 }

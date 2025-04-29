@@ -3,7 +3,6 @@ package com.example.events.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.validation.constraints.*;
 
 import java.util.UUID;
 
@@ -11,10 +10,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TypeDTO {
+    private UUID id;
     private double price;
     private String distance;
     private String results;
-
-    @NotNull(message = "Event ID cannot be null")
     private UUID eventId;
 }
