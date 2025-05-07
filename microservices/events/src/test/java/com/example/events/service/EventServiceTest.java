@@ -2,15 +2,10 @@ package com.example.events.service;
 
 import com.example.events.dto.EventDTO;
 import com.example.events.entity.Event;
-import com.example.events.exception.InvalidPatchException;
 import com.example.events.exception.ResourceNotFoundException;
 import com.example.events.repository.EventRepository;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.fge.jsonpatch.JsonPatch;
-import com.github.fge.jsonpatch.JsonPatchException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

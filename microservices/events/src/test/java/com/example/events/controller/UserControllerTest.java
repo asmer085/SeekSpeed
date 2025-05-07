@@ -2,6 +2,7 @@ package com.example.events.controller;
 
 import com.example.events.entity.User;
 import com.example.events.exception.GlobalExceptionHandler;
+import com.example.events.exception.ResourceNotFoundException;
 import com.example.events.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,8 +16,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Collections;
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,8 +35,13 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(userController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
+
+        userId = UUID.randomUUID();
         testUser = new User();
-        testUser.setId(UUID.randomUUID());
+        testUser.setId(userId);
         testUser.setFirstName("John");
         testUser.setLastName("Doe");
         testUser.setEmail("john.doe@example.com");
@@ -46,14 +52,15 @@ class UserControllerTest {
         testUser.setCountry("USA");
     }
 
-
     @Test
     void getAllUsers_ShouldReturnUserList() throws Exception {
         when(userService.getAllUsers()).thenReturn(Collections.singletonList(testUser));
 
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].username").value("john"));
+                .andExpect(jsonPath("$[0].firstName").value("John"))
+                .andExpect(jsonPath("$[0].lastName").value("Doe"))
+                .andExpect(jsonPath("$[0].email").value("john.doe@example.com"));
     }
 
     @Test
@@ -62,6 +69,22 @@ class UserControllerTest {
 
         mockMvc.perform(get("/api/users/{userId}", userId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("john"));
+                .andExpect(jsonPath("$.firstName").value("John"))
+                .andExpect(jsonPath("$.lastName").value("Doe"))
+                .andExpect(jsonPath("$.email").value("john.doe@example.com"));
     }
+
+    @Test
+    void getUserById_NotFound_ShouldReturn404() throws Exception {
+        UUID nonExistentId = UUID.randomUUID();
+        when(userService.getUserById(nonExistentId))
+                .thenThrow(new ResourceNotFoundException("User not found"));
+
+        mockMvc.perform(get("/api/users/{userId}", nonExistentId))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("User not found"))
+                .andExpect(jsonPath("$.errorType").value("not_found"))
+                .andExpect(jsonPath("$.path").value("/api/users/" + nonExistentId.toString()));
+    }
+
 }
