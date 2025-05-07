@@ -6,6 +6,7 @@ import java.util.UUID;
 
 @Data
 @Entity
+@Table(name = "app_user")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
