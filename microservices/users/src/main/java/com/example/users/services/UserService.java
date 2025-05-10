@@ -16,15 +16,12 @@ import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.userdetails.*;
 
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService{
 
     @Autowired
     private UserRepository userRepository;
@@ -47,11 +44,40 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
     }
 
+    public Users getUserByUsername(String username) {
+        Users user = userRepository.findByUsername(username);
+        if (user == null) throw new UserNotFoundException("User with username " + username + " not found");
+        return user;
+    }
+
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Users user = userRepository.findByUsername(username);
+        if (user == null) throw new UsernameNotFoundException("User Not Found with username: " + username);
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                Collections.emptyList()
+        );
+    }
+
     public UserDTO createUser(UserDTO userDTO) {
+        String password = userDTO.getPassword();
+
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("Password is required");
+        }
+        if (password.length() < 8) {
+            throw new IllegalArgumentException("Password must be at least 8 characters long");
+        }
+        if (!password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]+$")) {
+            throw new IllegalArgumentException("Password must contain at least one letter and one number");
+        }
+
         Users user = userMapper.userDTOToUsers(userDTO);
         Users savedUser = userRepository.save(user);
         return userMapper.usersToUserDTO(savedUser);
     }
+
 
     @Transactional
     public List<UserDTO> createUsersBatch(List<UserDTO> usersDTO) {
@@ -81,6 +107,7 @@ public class UserService {
                 .map(existingUser -> {
                     if (updatedUser.getFirstName() != null) existingUser.setFirstName(updatedUser.getFirstName());
                     if (updatedUser.getLastName() != null) existingUser.setLastName(updatedUser.getLastName());
+                    if (updatedUser.getUsername() != null) existingUser.setUsername(updatedUser.getUsername());
                     if (updatedUser.getEmailAddress() != null) existingUser.setEmailAddress(updatedUser.getEmailAddress());
                     if (updatedUser.getPassword() != null) existingUser.setPassword(updatedUser.getPassword());
                     if (updatedUser.getRole() != null) existingUser.setRole(updatedUser.getRole());

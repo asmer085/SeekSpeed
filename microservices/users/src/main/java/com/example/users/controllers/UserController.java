@@ -21,6 +21,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+
     @GetMapping("/all")
     public @ResponseBody Iterable<Users> getAllUsers() {
         return userService.getAllUsers();
@@ -30,6 +31,16 @@ public class UserController {
     public ResponseEntity<Users> getUserById(@PathVariable UUID userId) {
         try {
             Users user = userService.getUserById(userId);
+            return ResponseEntity.ok(user);
+        } catch (UserService.UserNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<Users> getUserByUsername(@PathVariable String username) {
+        try {
+            Users user = userService.getUserByUsername(username);
             return ResponseEntity.ok(user);
         } catch (UserService.UserNotFoundException e) {
             return ResponseEntity.notFound().build();
