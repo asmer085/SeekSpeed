@@ -2,6 +2,7 @@ package com.example.events.service;
 
 import com.example.events.dto.EventDTO;
 import com.example.events.entity.Event;
+import com.example.events.entity.User;
 import com.example.events.exception.InvalidPatchException;
 import com.example.events.exception.ResourceNotFoundException;
 import com.example.events.repository.EventRepository;
@@ -25,14 +26,19 @@ import java.util.UUID;
 public class EventService {
     @Autowired
     private final EventRepository eventRepository;
+    private final RemoteUserSyncService remoteUserSyncService;
 
     public Event createEvent(EventDTO eventDTO) {
+        // Validacija i sinhronizacija korisnika (organizatora)
+        UUID organizerId = eventDTO.getOrganizerID();
+        User organizer = remoteUserSyncService.fetchAndSaveUserIfMissing(organizerId);
+
         Event event = new Event();
         event.setStreet(eventDTO.getStreet());
         event.setCity(eventDTO.getCity());
         event.setCountry(eventDTO.getCountry());
         event.setCategory(eventDTO.getCategory());
-        event.setOrganizerID(eventDTO.getOrganizerID());
+        event.setOrganizerID(organizer.getId());
         event.setName(eventDTO.getName());
         event.setDescription(eventDTO.getDescription());
         event.setDateTime(eventDTO.getDateTime());

@@ -20,7 +20,7 @@ public class EventDTO {
     @NotNull(message = "Organizer ID cannot be null")
     private UUID organizerID;
 
-    @NotNull(message = "Organizer ID cannot be null")
+    @NotNull(message = "Name cannot be null")
     @Size(max = 100, message = "Name cannot exceed 100 characters")
     private String name;
 

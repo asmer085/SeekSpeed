@@ -1,16 +1,12 @@
-package com.example.events.entity;
+package com.example.events.external;
 
-import jakarta.persistence.*;
 import lombok.Data;
+
 import java.util.UUID;
 
 @Data
-@Entity
-@Table(name = "app_user")
-public class User {
-    @Id
+public class Users {
     private UUID id;
-
     private String firstName;
     private String lastName;
     private String emailAddress;

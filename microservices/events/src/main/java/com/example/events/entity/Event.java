@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,6 +20,8 @@ public class Event {
     private String city;
     private String country;
     private String category;
+
+    @NotNull(message = "Organizer ID cannot be null")
     private UUID organizerID;
     private String name;
     private String description;
