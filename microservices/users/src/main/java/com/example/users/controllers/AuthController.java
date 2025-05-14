@@ -1,6 +1,7 @@
 package com.example.users.controllers;
 
 import com.example.users.dtos.LoginDTO;
+import com.example.users.dtos.TokenRefreshRequest;
 import com.example.users.dtos.UserDTO;
 import com.example.users.entity.Users;
 import com.example.users.mappers.UserMapper;
@@ -18,6 +19,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.context.annotation.Lazy;
+
+import java.util.Map;
 
 
 @RestController
@@ -38,7 +41,7 @@ public class AuthController {
 
 
     @PostMapping("/signin")
-    public String authenticateUser(@RequestBody LoginDTO user) {
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginDTO user) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         user.getUsername(),
@@ -47,7 +50,14 @@ public class AuthController {
         );
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Users dbUser = userRepository.findByUsername(user.getUsername());
-        return jwtUtils.generateToken(userDetails.getUsername(), dbUser.getRole());
+
+        String accessToken = jwtUtils.generateToken(userDetails.getUsername(), dbUser.getRole());
+        String refreshToken = jwtUtils.generateRefreshToken(userDetails.getUsername());
+
+        return ResponseEntity.ok().body(Map.of(
+                "accessToken", accessToken,
+                "refreshToken", refreshToken
+        ));
     }
 
     @PostMapping("/signup")
@@ -81,6 +91,26 @@ public class AuthController {
         }
         return ResponseEntity.ok("Logged out and token blacklisted.");
     }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(@RequestBody TokenRefreshRequest request) {
+        String refreshToken = request.getRefreshToken();
+        if (refreshToken == null || !jwtUtils.validateRefreshToken(refreshToken)) {
+            return ResponseEntity.status(401).body("Invalid refresh token");
+        }
+
+        String username = jwtUtils.getUsernameFromToken(refreshToken);
+        Users dbUser = userRepository.findByUsername(username);
+        if (dbUser == null) {
+            return ResponseEntity.status(404).body("User not found");
+        }
+
+        String newAccessToken = jwtUtils.generateToken(username, dbUser.getRole());
+        return ResponseEntity.ok().body(Map.of(
+                "accessToken", newAccessToken
+        ));
+    }
+
 
 }
 

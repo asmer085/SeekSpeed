@@ -83,4 +83,24 @@ public class JwtUtil {
                 .getExpiration();
     }
 
+    public String generateRefreshToken(String username) {
+        long refreshTokenValidity = 7*24*60*60*1000;
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenValidity))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+
+    public boolean validateRefreshToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }

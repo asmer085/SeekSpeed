@@ -57,7 +57,8 @@ public class WebSecurityConfig {
                                 HttpMethod.POST,
                                 "/api/auth/signup",
                                 "/api/auth/signin",
-                                "/api/auth/logout"
+                                "/api/auth/logout",
+                                "api/auth/refresh-token"
                         ).permitAll()
                         .requestMatchers(
                                 "/v3/api-docs/**",

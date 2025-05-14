@@ -6,6 +6,7 @@ com\example\users\services\OrderService.class
 com\example\users\services\EquipmentService$EquipmentNotFoundException.class
 com\example\users\services\TypeService$TypeNotFoundException.class
 com\example\users\controllers\StatisticsController.class
+com\example\users\dtos\TokenRefreshRequest.class
 com\example\users\dtos\UserDTO.class
 com\example\users\entity\UserEvent.class
 com\example\users\mappers\TypeMapperImpl.class
