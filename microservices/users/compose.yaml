@@ -16,5 +16,14 @@ services:
     volumes:
       - redis_data:/data
 
+  rabbitmq:
+    image: 'rabbitmq:3-management'
+    ports:
+      - '5672:5672'    # RabbitMQ broker port (AMQP)
+      - '15672:15672'  # RabbitMQ Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: 'guest'
+      RABBITMQ_DEFAULT_PASS: 'guest'
+
 volumes:
   redis_data:

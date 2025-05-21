@@ -1,4 +1,5 @@
 C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\config\OpenApiConfig.java
+C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\config\RabbitMQConfig.java
 C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\config\RedisConfig.java
 C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\controllers\AuthController.java
 C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\controllers\EquipmentController.java
@@ -18,6 +19,7 @@ C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\examp
 C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\dtos\TypeDTO.java
 C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\dtos\UserDTO.java
 C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\dtos\UserEventDTO.java
+C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\dtos\UserUpdateEventDTO.java
 C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\entity\Equipment.java
 C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\entity\Newsletter.java
 C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\entity\Orders.java
@@ -32,6 +34,8 @@ C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\examp
 C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\mappers\StatisticsMapper.java
 C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\mappers\TypeMapper.java
 C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\mappers\UserMapper.java
+C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\messaging\TestQueueListener.java
+C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\messaging\UserEventPublisher.java
 C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\repository\EquipmentRepository.java
 C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\repository\NewsletterRepository.java
 C:\Users\Emir\IdeaProjects\SeekSpeed\microservices\users\src\main\java\com\example\users\repository\OrderRepository.java

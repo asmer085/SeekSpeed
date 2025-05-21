@@ -1,8 +1,11 @@
+
 package com.example.users.services;
 
 import com.example.users.dtos.UserDTO;
+import com.example.users.dtos.UserUpdateEventDTO;
 import com.example.users.entity.Users;
 import com.example.users.mappers.UserMapper;
+import com.example.users.messaging.UserEventPublisher;
 import com.example.users.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -34,6 +37,9 @@ public class UserService implements UserDetailsService{
 
     @Autowired
     private Validator validator;
+
+    @Autowired
+    private UserEventPublisher userEventPublisher;
 
     public Iterable<Users> getAllUsers() {
         return userRepository.findAll();
@@ -75,6 +81,21 @@ public class UserService implements UserDetailsService{
 
         Users user = userMapper.userDTOToUsers(userDTO);
         Users savedUser = userRepository.save(user);
+        // Sending message through RabbitMQ for events service
+        UserUpdateEventDTO userEvent = new UserUpdateEventDTO(
+                savedUser.getId(),
+                savedUser.getFirstName(),
+                savedUser.getLastName(),
+                savedUser.getEmailAddress(),
+                savedUser.getRole(),
+                savedUser.getDateOfBirth(),
+                savedUser.getGender(),
+                savedUser.getTShirtSize(),
+                savedUser.getCountry(),
+                savedUser.getPicture(),
+                "CREATE"
+        );
+        userEventPublisher.sendUserUpdate(userEvent);
         return userMapper.usersToUserDTO(savedUser);
     }
 
@@ -95,6 +116,23 @@ public class UserService implements UserDetailsService{
         }
 
         Iterable<Users> savedUsers = userRepository.saveAll(users);
+        // Sending message through RabbitMQ for events service
+        for (Users user : users) {
+            UserUpdateEventDTO event = new UserUpdateEventDTO(
+                    user.getId(),
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getEmailAddress(),
+                    user.getRole(),
+                    user.getDateOfBirth(),
+                    user.getGender(),
+                    user.getTShirtSize(),
+                    user.getCountry(),
+                    user.getPicture(),
+                    "BATCH"
+            );
+            userEventPublisher.sendUserUpdate(event);
+        }
 
         return users.stream()
                 .map(userMapper::usersToUserDTO)
@@ -118,7 +156,25 @@ public class UserService implements UserDetailsService{
                     if (updatedUser.getOrganisationFile() != null) existingUser.setOrganisationFile(updatedUser.getOrganisationFile());
                     if (updatedUser.getCountry() != null) existingUser.setCountry(updatedUser.getCountry());
 
-                    return ResponseEntity.ok(userRepository.save(existingUser));
+                    Users saved = userRepository.save(existingUser);
+
+                    // Sending message through RabbitMQ for events service
+                    UserUpdateEventDTO event = new UserUpdateEventDTO(
+                            saved.getId(),
+                            saved.getFirstName(),
+                            saved.getLastName(),
+                            saved.getEmailAddress(),
+                            saved.getRole(),
+                            saved.getDateOfBirth(),
+                            saved.getGender(),
+                            saved.getTShirtSize(),
+                            saved.getCountry(),
+                            saved.getPicture(),
+                            "PUT"
+                    );
+                    userEventPublisher.sendUserUpdate(event);
+
+                    return ResponseEntity.ok(saved);
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -140,6 +196,23 @@ public class UserService implements UserDetailsService{
                 }
                 throw new RuntimeException(errorMessage.toString());
             }
+
+            // Sending message through RabbitMQ for events service
+            UserUpdateEventDTO userUpdateEventDTO = new UserUpdateEventDTO(
+                    patchedUser.getId(),
+                    patchedUser.getFirstName(),
+                    patchedUser.getLastName(),
+                    patchedUser.getEmailAddress(),
+                    patchedUser.getRole(),
+                    patchedUser.getDateOfBirth(),
+                    patchedUser.getGender(),
+                    patchedUser.getTShirtSize(),
+                    patchedUser.getCountry(),
+                    patchedUser.getPicture(),
+                    "PATCH"
+            );
+            userEventPublisher.sendUserUpdate(userUpdateEventDTO);
+
             return userRepository.save(patchedUser);
         } catch (JsonPatchException | JsonProcessingException e) {
             throw new RuntimeException(e.getMessage());
@@ -150,6 +223,23 @@ public class UserService implements UserDetailsService{
         return userRepository.findById(userId)
                 .map(user -> {
                     userRepository.delete(user);
+
+
+                    UserUpdateEventDTO event = new UserUpdateEventDTO(
+                            user.getId(),
+                            user.getFirstName(),
+                            user.getLastName(),
+                            user.getEmailAddress(),
+                            user.getRole(),
+                            user.getDateOfBirth(),
+                            user.getGender(),
+                            user.getTShirtSize(),
+                            user.getCountry(),
+                            user.getPicture(),
+                            "DELETE"
+                    );
+                    userEventPublisher.sendUserUpdate(event);
+
                     return ResponseEntity.ok().build();
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
