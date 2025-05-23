@@ -22,7 +22,7 @@ public class Type {
     private String results;
 
     @Column()
-    private UUID eventUuid;
+    private UUID uuid;
 
     public UUID getId() { return id; }
 
@@ -36,7 +36,7 @@ public class Type {
 
     public void setResults(String results) { this.results = results; }
 
-    public UUID getUuid() { return eventUuid; }
+    public UUID getUuid() { return uuid; }
 
-    public void setUuid(UUID eventUuid) { this.eventUuid = eventUuid; }
+    public void setUuid(UUID eventUuid) { this.uuid = eventUuid; }
 }

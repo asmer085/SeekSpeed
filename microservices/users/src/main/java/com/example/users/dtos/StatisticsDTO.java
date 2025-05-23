@@ -26,14 +26,6 @@ public class StatisticsDTO {
     private UUID userId;
     private UUID typeId;
 
-    /*@ManyToOne
-    @JoinColumn(name = "user_id")
-    private Users user;
-
-    @ManyToOne
-    @JoinColumn(name = "type_id")
-    private Type type;*/
-
     public Double getAveragePace() { return averagePace; }
 
     public void setAveragePace(Double averagePace) { this.averagePace = averagePace; }
