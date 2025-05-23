@@ -1,6 +1,7 @@
 package com.example.events.service;
 
 import com.example.events.entity.User;
+import com.example.events.exception.ResourceNotFoundException;
 import com.example.events.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,6 @@ public class UserService {
 
     public User getUserById(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
     }
 }

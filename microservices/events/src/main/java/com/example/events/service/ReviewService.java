@@ -3,6 +3,7 @@ package com.example.events.service;
 import com.example.events.dto.ReviewDTO;
 import com.example.events.entity.Event;
 import com.example.events.entity.Review;
+import com.example.events.exception.ResourceNotFoundException;
 import com.example.events.repository.EventRepository;
 import com.example.events.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class ReviewService {
         review.setUserUUID(reviewDTO.getUserUUID());
 
         Event event = eventRepository.findById(reviewDTO.getEventId())
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + reviewDTO.getEventId()));
         review.setEvent(event);
 
         return reviewRepository.save(review);
@@ -38,7 +39,7 @@ public class ReviewService {
 
     public List<Review> getReviewsByEventId(UUID eventId) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found with id: " + eventId));
         return reviewRepository.findByEvent(event);
     }
 }
