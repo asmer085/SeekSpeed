@@ -1,6 +1,4 @@
-package com.example.users.dtos;
-
-import jakarta.persistence.Column;
+package com.example.users.dto;
 
 import java.util.UUID;
 

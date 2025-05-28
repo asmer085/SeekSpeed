@@ -1,6 +1,6 @@
 package com.example.users.controllers;
 
-import com.example.users.dtos.EquipmentDTO;
+import com.example.users.dto.EquipmentDTO;
 import com.example.users.entity.Equipment;
 import com.example.users.services.EquipmentService;
 import com.fasterxml.jackson.databind.ObjectMapper;

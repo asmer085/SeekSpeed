@@ -1,6 +1,6 @@
 package com.example.users.services;
 
-import com.example.users.dtos.TypeDTO;
+import com.example.users.dto.TypeDTO;
 import com.example.users.entity.Type;
 import com.example.users.mappers.TypeMapper;
 import com.example.users.repository.TypeRepository;
@@ -55,7 +55,7 @@ public class TypeService {
                 .map(type -> {
                     if (updatedType.getDistance() != null) type.setDistance(updatedType.getDistance());
                     if (updatedType.getResults() != null) type.setResults(updatedType.getResults());
-                    if (updatedType.getUuid() != null) type.setUuid(updatedType.getUuid());
+                    if (updatedType.getUuid() != null) type.setTypeId(updatedType.getUuid());
                     return ResponseEntity.ok(typeRepository.save(type));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());

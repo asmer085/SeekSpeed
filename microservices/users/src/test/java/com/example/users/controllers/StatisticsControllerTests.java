@@ -1,6 +1,6 @@
 package com.example.users.controllers;
 
-import com.example.users.dtos.StatisticsDTO;
+import com.example.users.dto.StatisticsDTO;
 import com.example.users.entity.Statistics;
 import com.example.users.services.StatisticsService;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,6 +1,6 @@
 package com.example.users.services;
 
-import com.example.users.dtos.OrdersDTO;
+import com.example.users.dto.OrdersDTO;
 import com.example.users.entity.Orders;
 import com.example.users.mappers.OrdersMapper;
 import com.example.users.repository.OrderRepository;

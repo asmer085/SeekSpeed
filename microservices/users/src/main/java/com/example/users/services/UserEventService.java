@@ -1,11 +1,10 @@
 package com.example.users.services;
 
-import com.example.users.dtos.UserEventDTO;
+import com.example.users.dto.UserEventDTO;
 import com.example.users.entity.UserEvent;
 import com.example.users.entity.Users;
 import com.example.users.repository.UserEventRepository;
 import com.example.users.repository.UserRepository;
-import com.example.users.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

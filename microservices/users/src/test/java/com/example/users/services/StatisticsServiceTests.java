@@ -1,6 +1,6 @@
 package com.example.users.services;
 
-import com.example.users.dtos.StatisticsDTO;
+import com.example.users.dto.StatisticsDTO;
 import com.example.users.entity.Statistics;
 import com.example.users.entity.Type;
 import com.example.users.entity.Users;
@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

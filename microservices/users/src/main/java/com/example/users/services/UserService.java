@@ -1,11 +1,10 @@
 
 package com.example.users.services;
 
-import com.example.users.dtos.UserDTO;
-import com.example.users.dtos.UserUpdateEventDTO;
+import com.example.users.dto.UserDTO;
+import com.example.users.dto.UserUpdateEventDTO;
 import com.example.users.entity.Users;
 import com.example.users.mappers.UserMapper;
-import com.example.users.messaging.UserEventPublisher;
 import com.example.users.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,9 +36,6 @@ public class UserService implements UserDetailsService{
 
     @Autowired
     private Validator validator;
-
-    @Autowired
-    private UserEventPublisher userEventPublisher;
 
     public Iterable<Users> getAllUsers() {
         return userRepository.findAll();
@@ -95,7 +91,7 @@ public class UserService implements UserDetailsService{
                 savedUser.getPicture(),
                 "CREATE"
         );
-        userEventPublisher.sendUserUpdate(userEvent);
+        //userEventPublisher.sendUserUpdate(userEvent);
         return userMapper.usersToUserDTO(savedUser);
     }
 
@@ -131,7 +127,7 @@ public class UserService implements UserDetailsService{
                     user.getPicture(),
                     "BATCH"
             );
-            userEventPublisher.sendUserUpdate(event);
+            //userEventPublisher.sendUserUpdate(event);
         }
 
         return users.stream()
@@ -172,7 +168,7 @@ public class UserService implements UserDetailsService{
                             saved.getPicture(),
                             "PUT"
                     );
-                    userEventPublisher.sendUserUpdate(event);
+                    //userEventPublisher.sendUserUpdate(event);
 
                     return ResponseEntity.ok(saved);
                 })
@@ -211,7 +207,7 @@ public class UserService implements UserDetailsService{
                     patchedUser.getPicture(),
                     "PATCH"
             );
-            userEventPublisher.sendUserUpdate(userUpdateEventDTO);
+            //userEventPublisher.sendUserUpdate(userUpdateEventDTO);
 
             return userRepository.save(patchedUser);
         } catch (JsonPatchException | JsonProcessingException e) {
@@ -238,7 +234,7 @@ public class UserService implements UserDetailsService{
                             user.getPicture(),
                             "DELETE"
                     );
-                    userEventPublisher.sendUserUpdate(event);
+                    //userEventPublisher.sendUserUpdate(event);
 
                     return ResponseEntity.ok().build();
                 })

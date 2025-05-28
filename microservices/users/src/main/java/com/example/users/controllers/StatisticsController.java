@@ -1,9 +1,8 @@
 package com.example.users.controllers;
 
-import com.example.users.dtos.StatisticsDTO;
+import com.example.users.dto.StatisticsDTO;
 import com.example.users.entity.Statistics;
 import com.example.users.services.StatisticsService;
-import com.example.users.services.UserService;
 import com.github.fge.jsonpatch.JsonPatch;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

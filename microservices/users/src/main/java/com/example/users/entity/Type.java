@@ -21,8 +21,20 @@ public class Type {
     @Column()
     private String results;
 
+    @Column
+    private Double price;
+
     @Column()
-    private UUID uuid;
+    private UUID typeId;
+
+    public Type() {}
+
+    public Type(String distance, String results, Double price, UUID typeId) {
+        this.distance = distance;
+        this.results = results;
+        this.price = price;
+        this.typeId = typeId;
+    }
 
     public UUID getId() { return id; }
 
@@ -36,7 +48,11 @@ public class Type {
 
     public void setResults(String results) { this.results = results; }
 
-    public UUID getUuid() { return uuid; }
+    public void setPrice(Double price) {this.price = price;}
 
-    public void setUuid(UUID eventUuid) { this.uuid = eventUuid; }
+    public Double getPrice() {return this.price;}
+
+    public UUID getTypeId() { return typeId; }
+
+    public void setTypeId(UUID eventUuid) { this.typeId = eventUuid; }
 }

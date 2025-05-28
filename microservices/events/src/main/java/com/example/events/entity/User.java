@@ -40,6 +40,19 @@ public class User {
         this.userId = userId;
     }
 
+    public User(String firstName, String lastName, String username, String emailAddress, String picture, String dateOfBirth, String gender, String country, String tShirtSize, UUID id) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.emailAddress = emailAddress;
+        this.picture = picture;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.country = country;
+        this.tShirtSize = tShirtSize;
+        this.userId = id;
+    }
+
     public User() {
         // Prazan konstruktor potreban JPA-u
     }

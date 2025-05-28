@@ -1,45 +1,49 @@
-package com.example.users.dtos;
+package com.example.users.dto;
 
-import jakarta.validation.constraints.*;
+import java.io.Serializable;
+import java.util.UUID;
 
-public class UserDTO {
+public class UserUpdateEventDTO implements Serializable {
 
-    @NotBlank(message = "First name is required")
-    @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
+    private static final long serialVersionUID = 1L;
+
+    private UUID userId;
     private String firstName;
-
-    @NotBlank(message = "Last name is required")
-    @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
     private String lastName;
-
-    @NotBlank(message = "Username is required")
-    @Size(min = 5, max = 40, message = "Username must be between 5 and 40 characters")
-    private String username;
-
-    @NotBlank(message = "Email address is required")
-    @Email(message = "Invalid email format")
     private String emailAddress;
-
-    private String password;
-
     private String role;
-
     private String dateOfBirth;
-
-    @NotBlank(message = "Gender is required")
-    @Pattern(regexp = "Male|Female|Other", message = "Gender must be 'Male', 'Female' or 'Other'")
     private String gender;
-
-    @Pattern(regexp = "XS|S|M|L|XL|XXL", message = "Invalid t-shirt size")
     private String tShirtSize;
-
-    private String organisationFile;
-
     private String country;
-
     private String picture;
+    private String operationType;
 
-    // Getters and setters
+    // Constructors
+    public UserUpdateEventDTO(UUID userId, String firstName, String lastName, String emailAddress, String role,
+                              String dateOfBirth, String gender, String tShirtSize, String country, String picture, String operationType) {
+        this.userId = userId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.emailAddress = emailAddress;
+        this.role = role;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.tShirtSize = tShirtSize;
+        this.country = country;
+        this.picture = picture;
+        this.operationType = operationType;
+    }
+
+    // Getters and setters...
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -56,24 +60,12 @@ public class UserDTO {
         this.lastName = lastName;
     }
 
-    public String getUsername() {return this.username = username;}
-
-    public void setUsername(String username) {this.username = username;}
-
     public String getEmailAddress() {
         return emailAddress;
     }
 
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getRole() {
@@ -108,14 +100,6 @@ public class UserDTO {
         this.tShirtSize = tShirtSize;
     }
 
-    public String getOrganisationFile() {
-        return organisationFile;
-    }
-
-    public void setOrganisationFile(String organisationFile) {
-        this.organisationFile = organisationFile;
-    }
-
     public String getCountry() {
         return country;
     }
@@ -128,7 +112,15 @@ public class UserDTO {
         return picture;
     }
 
-    public void setPicture(String pic) {
-        this.picture= pic;
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
+
+    public void setOperationType(String operationType) {
+        this.operationType = operationType;
+    }
+
+    public String getOperationType() {
+        return this.operationType;
     }
 }

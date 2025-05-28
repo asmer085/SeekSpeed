@@ -1,6 +1,6 @@
 package com.example.users.controllers;
 
-import com.example.users.dtos.UserDTO;
+import com.example.users.dto.UserDTO;
 import com.example.users.entity.Users;
 import com.example.users.services.UserService;
 import com.github.fge.jsonpatch.JsonPatch;

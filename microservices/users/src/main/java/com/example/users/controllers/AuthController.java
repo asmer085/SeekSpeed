@@ -1,8 +1,8 @@
 package com.example.users.controllers;
 
-import com.example.users.dtos.LoginDTO;
-import com.example.users.dtos.TokenRefreshRequest;
-import com.example.users.dtos.UserDTO;
+import com.example.users.dto.LoginDTO;
+import com.example.users.dto.TokenRefreshRequest;
+import com.example.users.dto.UserDTO;
 import com.example.users.entity.Users;
 import com.example.users.mappers.UserMapper;
 import com.example.users.repository.UserRepository;
@@ -15,10 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.context.annotation.Lazy;
 
 import java.util.Map;
 

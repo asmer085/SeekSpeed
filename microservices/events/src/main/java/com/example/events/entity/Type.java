@@ -13,6 +13,7 @@ public class Type {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Column()
     private double price;
     private String distance;
     private String results;
@@ -24,6 +25,12 @@ public class Type {
     // Constructor without ID (for normal use)
     public Type(double price, String distance, String results, Event event) {
         this.price = price;
+        this.distance = distance;
+        this.results = results;
+        this.event = event;
+    }
+
+    public Type(String distance, String results, Event event) {
         this.distance = distance;
         this.results = results;
         this.event = event;

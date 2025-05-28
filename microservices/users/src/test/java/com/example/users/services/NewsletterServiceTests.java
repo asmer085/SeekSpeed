@@ -1,6 +1,6 @@
 package com.example.users.services;
 
-import com.example.users.dtos.NewsletterDTO;
+import com.example.users.dto.NewsletterDTO;
 import com.example.users.entity.Newsletter;
 import com.example.users.entity.Users;
 import com.example.users.mappers.NewsletterMapper;

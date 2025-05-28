@@ -1,18 +1,20 @@
 package com.example.events.config;
 
+import com.example.events.dto.UserTypeDTO;
 import com.example.events.entity.Event;
 import com.example.events.entity.Review;
 import com.example.events.entity.Type;
 import com.example.events.entity.User;
+import com.example.events.messaging.Listener;
 import com.example.events.repository.EventRepository;
 import com.example.events.repository.ReviewRepository;
 import com.example.events.repository.TypeRepository;
 import com.example.events.repository.UserRepository;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class DatabaseSeeder implements CommandLineRunner {
@@ -21,26 +23,34 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final EventRepository eventRepository;
     private final TypeRepository typeRepository;
     private final ReviewRepository reviewRepository;
+    private final RabbitTemplate rabbitTemplate;
+    private final Listener listener;
 
     public DatabaseSeeder(UserRepository userRepository,
                           EventRepository eventRepository,
                           TypeRepository typeRepository,
-                          ReviewRepository reviewRepository) {
+                          ReviewRepository reviewRepository,
+                          RabbitTemplate rabbitTemplate,
+                          Listener listener) {
+
         this.userRepository = userRepository;
         this.eventRepository = eventRepository;
         this.typeRepository = typeRepository;
         this.reviewRepository = reviewRepository;
+        this.rabbitTemplate = rabbitTemplate;
+        this.listener = listener;
     }
 
     @Override
-    public void run(String... args) {
-        seedUsers();
+    public void run(String... args) throws InterruptedException {
+        listener.waitForUsers();
         seedEvents();
         seedTypes();
         seedReviews();
+        sendTypesToUsersService();
     }
 
-    private void seedUsers() {
+    /*private void seedUsers() {
         if (userRepository.count() == 0) {
             List<User> users = List.of(
                     new User(UUID.randomUUID(),"JwtSignUp", "JwtToken", "jwtXoxo", "string@gmail.com", "jwt.jpg", "string", "user", "Female", "string", "L", UUID.fromString("1685148a-d460-406a-babe-adf96016ecbd")),
@@ -58,7 +68,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             userRepository.saveAll(users);
         }
-    }
+    }*/
 
     private void seedEvents() {
         if (eventRepository.count() == 0) {
@@ -85,6 +95,27 @@ public class DatabaseSeeder implements CommandLineRunner {
         }
     }
 
+    private void sendTypesToUsersService() {
+        List<Type> types = typeRepository.findAll();
+        List<UserTypeDTO> usersType = types.stream()
+                .map(type -> new UserTypeDTO(
+                        type.getDistance(),
+                        type.getResults(),
+                        type.getPrice(),
+                        type.getId()
+                )).toList();
+
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.TYPE_EXCHANGE,
+                RabbitMQConfig.TYPE_ROUTING_KEY,
+                usersType,
+                        message -> {
+                            message.getMessageProperties().getHeaders().put("__TypeId__", "java.util.List");
+                            return message;
+                        }
+        );
+        System.out.println("****Type data sent to Users service****");
+    }
     private void seedTypes() {
         if (typeRepository.count() == 0) {
             List<Event> events = (List<Event>) eventRepository.findAll();

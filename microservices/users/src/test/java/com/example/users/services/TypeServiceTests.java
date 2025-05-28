@@ -1,6 +1,6 @@
 package com.example.users.services;
 
-import com.example.users.dtos.TypeDTO;
+import com.example.users.dto.TypeDTO;
 import com.example.users.entity.Type;
 import com.example.users.mappers.TypeMapper;
 import com.example.users.repository.TypeRepository;
@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
-import org.hibernate.validator.constraints.ModCheck;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

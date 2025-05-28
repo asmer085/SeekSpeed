@@ -1,10 +1,6 @@
-package com.example.users.dtos;
+package com.example.users.dto;
 
-import com.example.users.entity.Type;
-import com.example.users.entity.Users;
 import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.PositiveOrZero;
 
 import java.util.UUID;

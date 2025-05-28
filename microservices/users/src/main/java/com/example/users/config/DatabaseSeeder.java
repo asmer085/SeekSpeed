@@ -1,15 +1,16 @@
 package com.example.users.config;
 
+import com.example.users.dto.EventUserDTO;
 import com.example.users.entity.*;
 import com.example.users.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class DatabaseSeeder implements CommandLineRunner {
@@ -20,29 +21,61 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final OrderRepository orderRepository;
     private final NewsletterRepository newsletterRepository;
     private final EquipmentRepository equipmentRepository;
+    private final RabbitTemplate rabbitTemplate;
 
     public DatabaseSeeder(UserRepository userRepository,
                           TypeRepository typeRepository,
                           StatisticsRepository statisticsRepository,
                           OrderRepository orderRepository,
                           NewsletterRepository newsletterRepository,
-                          EquipmentRepository equipmentRepository) {
+                          EquipmentRepository equipmentRepository,
+                          RabbitTemplate rabbitTemplate) {
         this.userRepository = userRepository;
         this.typeRepository = typeRepository;
         this.statisticsRepository = statisticsRepository;
         this.orderRepository = orderRepository;
         this.newsletterRepository = newsletterRepository;
         this.equipmentRepository = equipmentRepository;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Override
     public void run(String... args) throws Exception {
         seedUsers();
-        seedTypes();
+        //seedTypes();
         seedEquipment();
         seedStatistics();
         seedOrders();
         seedNewsletters();
+        sendUsersToEventsService();
+    }
+
+    private void sendUsersToEventsService() {
+        List<Users> users = userRepository.findAll();
+        List<EventUserDTO> eventsUsers = users.stream()
+                .map(user -> new EventUserDTO(
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getUsername(),
+                        user.getEmailAddress(),
+                        user.getPicture(),
+                        user.getDateOfBirth(),
+                        user.getGender(),
+                        user.getCountry(),
+                        user.getTShirtSize(),
+                        user.getId()
+                )).toList();
+
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.USER_EXCHANGE,
+                RabbitMQConfig.USER_ROUTING_KEY,
+                eventsUsers,
+                message -> {
+                    message.getMessageProperties().getHeaders().put("__TypeId__", "java.util.List");
+                    return message;
+                }
+        );
+        System.out.println("****Users data sent to Events service****");
     }
 
     private void seedUsers() throws JsonProcessingException {
@@ -50,7 +83,6 @@ public class DatabaseSeeder implements CommandLineRunner {
             String usersJson = """
                 [
                     {
-                        "id": "1685148a-d460-406a-babe-adf96016ecbd",
                         "firstName": "JwtSignUp",
                         "lastName": "JwtToken",
                         "username": "jwtXoxo",
@@ -65,7 +97,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                         "tshirtSize": "L"
                     },
                     {
-                        "id": "5bd1e72b-0ab0-4fc0-be55-69b1b43d8bd6",
                         "firstName": "stringAPRILproba1",
                         "lastName": "Promjena",
                         "username": "stringApril",
@@ -80,7 +111,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                         "tshirtSize": "M"
                     },
                     {
-                        "id": "666d19e0-56ba-4865-90f9-9b229d466697",
                         "firstName": "probaNoviAddtetete",
                         "lastName": "probaPatchLastName",
                         "username": "tetete",
@@ -95,7 +125,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                         "tshirtSize": "XL"
                     },
                     {
-                        "id": "80d45932-cc33-41ff-af76-6a7853a5ca76",
                         "firstName": "probaNoviAdd",
                         "lastName": "probaPatchLastName",
                         "username": "probaNoviAdd",
@@ -110,7 +139,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                         "tshirtSize": "M"
                     },
                     {
-                        "id": "8b28ff41-6133-4513-8635-b8e481b347c1",
                         "firstName": "stringAPRILproba11010",
                         "lastName": "Promjena",
                         "username": "proba11010",
@@ -125,7 +153,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                         "tshirtSize": "M"
                     },
                     {
-                        "id": "93ff08d4-7153-4453-b7d6-8fea6911770d",
                         "firstName": "Ana",
                         "lastName": "Anić",
                         "username": "anaAnic1",
@@ -140,7 +167,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                         "tshirtSize": "M"
                     },
                     {
-                        "id": "97ab7a35-f239-4ee4-a01c-a293e0fdbfcc",
                         "firstName": "Marko",
                         "lastName": "Marković",
                         "username": "markoMark1",
@@ -155,7 +181,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                         "tshirtSize": "L"
                     },
                     {
-                        "id": "a2b31b60-79bf-4205-9726-b8765c91f6a5",
                         "firstName": "postmanTest",
                         "lastName": "patchPostmanPromjena",
                         "username": "postmanUsername1",
@@ -170,7 +195,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                         "tshirtSize": "L"
                     },
                     {
-                        "id": "b126ed50-7412-48ee-a8ca-3702badfba30",
                         "firstName": "EMIR",
                         "lastName": "EMIRR",
                         "username": "emiremir1",
@@ -185,7 +209,6 @@ public class DatabaseSeeder implements CommandLineRunner {
                         "tshirtSize": "XL"
                     },
                     {
-                        "id": "cb2e5f28-f329-45be-b47e-210dfd0dcfe4",
                         "firstName": "Ivan",
                         "lastName": "Ivić",
                         "username": "ivanivi1",
@@ -194,13 +217,12 @@ public class DatabaseSeeder implements CommandLineRunner {
                         "role": "admin",
                         "picture": "ivan.jpg",
                         "dateOfBirth": "1995-11-30",
-                        "gender": "Female",
+                        "gender": "Male",
                         "organisationFile": "org3.pdf",
                         "country": "Bosnia and Herzegovina",
                         "tshirtSize": "XL"
                     },
                     {
-                        "id": "d09c6d51-df26-4700-a31d-d3b7f85ab511",
                         "firstName": "oookay",
                         "lastName": "Ivić",
                         "username": "testUsername",
@@ -229,16 +251,24 @@ public class DatabaseSeeder implements CommandLineRunner {
             String typesJson = """
                 [
                     {
-                        "id": "d22da5bf-c912-474d-95da-17f229465af7",
-                        "distance": "2km",
-                        "results": "1km",
-                        "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                        "distance": "8km",
+                        "results": "Group pariticipation"
                     },
                     {
-                        "id": "e406ba35-a52d-421e-8473-8d75eeb6f87c",
-                        "distance": "4km",
-                        "results": "string",
-                        "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                        "distance": "10km",
+                        "results": "Individual results"
+                    },
+                    {
+                        "distance": "12km",
+                        "results": "Team results"
+                    },
+                    {
+                        "distance": "5km",
+                        "results": "Individual results"
+                    },
+                    {
+                        "distance": "6km",
+                        "results": "Team results"
                     }
                 ]
                 """;
@@ -255,9 +285,8 @@ public class DatabaseSeeder implements CommandLineRunner {
             String equipmentJson = """
                 [
                     {
-                        "id": "8359b467-996d-4d5e-ad4b-762cfd66060e",
                         "name": "string",
-                        "quantity": 1073741820
+                        "quantity": 1073
                     }
                 ]
                 """;
@@ -274,84 +303,74 @@ public class DatabaseSeeder implements CommandLineRunner {
             String statisticsJson = """
                 [
                     {
-                        "id": "3d1b7ead-051a-4584-ac5f-2db53476eb67",
                         "averagePace": 0.1,
                         "bestPace": 0.1,
                         "totalTime": 0.1,
-                        "userId": "666d19e0-56ba-4865-90f9-9b229d466697",
-                        "typeId": "d22da5bf-c912-474d-95da-17f229465af7"
+                        "username": "tetete",
+                        "distance": "8km"
                     },
                     {
-                        "id": "4018316f-52d8-4027-94ce-a36dae8887bb",
                         "averagePace": 0.1,
                         "bestPace": 0.1,
                         "totalTime": 0.1,
-                        "userId": "cb2e5f28-f329-45be-b47e-210dfd0dcfe4",
-                        "typeId": "d22da5bf-c912-474d-95da-17f229465af7"
+                        "username": "ivanivi1",
+                        "distance": "8km"
                     },
                     {
-                        "id": "40877710-c6b9-4886-be51-6fec97c6361c",
                         "averagePace": 0.1,
                         "bestPace": 0.1,
                         "totalTime": 0.1,
-                        "userId": "a2b31b60-79bf-4205-9726-b8765c91f6a5",
-                        "typeId": "d22da5bf-c912-474d-95da-17f229465af7"
+                        "username": "postmanUsername1",
+                        "distance": "12km"
                     },
                     {
-                        "id": "529debf7-b3be-4847-a62e-7a644d70904e",
                         "averagePace": 0.1,
                         "bestPace": 0.1,
                         "totalTime": 0.1,
-                        "userId": "b126ed50-7412-48ee-a8ca-3702badfba30",
-                        "typeId": "d22da5bf-c912-474d-95da-17f229465af7"
+                        "username": "emiremir1",
+                        "distance": "5km"
                     },
                     {
-                        "id": "79341ff8-7580-4add-b8f7-a26b138cff49",
                         "averagePace": 0.1,
                         "bestPace": 0.1,
                         "totalTime": 0.1,
-                        "userId": "cb2e5f28-f329-45be-b47e-210dfd0dcfe4",
-                        "typeId": "e406ba35-a52d-421e-8473-8d75eeb6f87c"
+                        "username": "ivanivi1",
+                        "distance": "5km"
                     },
                     {
-                        "id": "b5b8c4f3-0ff4-448e-9ad1-34c278d5f637",
                         "averagePace": 1.5,
                         "bestPace": 10.1,
                         "totalTime": 4.1,
-                        "userId": "80d45932-cc33-41ff-af76-6a7853a5ca76",
-                        "typeId": "d22da5bf-c912-474d-95da-17f229465af7"
+                        "username": "probaNoviAdd",
+                        "distance": "6km"
                     },
                     {
-                        "id": "bce27238-412b-40ce-938d-19466f61f46c",
                         "averagePace": 0.1,
                         "bestPace": 0.1,
                         "totalTime": 0.1,
-                        "userId": "5bd1e72b-0ab0-4fc0-be55-69b1b43d8bd6",
-                        "typeId": "e406ba35-a52d-421e-8473-8d75eeb6f87c"
+                        "username": "stringApril",
+                        "distance": "10km"
                     },
                     {
-                        "id": "c15bcf85-874f-4044-b86b-eaf62b953cb1",
                         "averagePace": 0.1,
                         "bestPace": 0.1,
                         "totalTime": 0.1,
-                        "userId": "8b28ff41-6133-4513-8635-b8e481b347c1",
-                        "typeId": "d22da5bf-c912-474d-95da-17f229465af7"
+                        "username": "proba11010",
+                        "distance": "8km"
                     },
                     {
-                        "id": "c432d7fb-09c1-4b3f-a7a7-dff5aef292c2",
                         "averagePace": 0.1,
                         "bestPace": 0.1,
                         "totalTime": 0.1,
-                        "userId": "93ff08d4-7153-4453-b7d6-8fea6911770d",
-                        "typeId": "d22da5bf-c912-474d-95da-17f229465af7"
+                        "username": "anaAnic1",
+                        "distance": "6km"
                     },
                     {
-                        "id": "d18e3ce5-fb7f-459b-9834-71ba790c175b",
                         "averagePace": 0.1,
                         "bestPace": 0.1,
                         "totalTime": 0.1,
-                        "userId": "97ab7a35-f239-4ee4-a01c-a293e0fdbfcc",
-                        "typeId": "d22da5bf-c912-474d-95da-17f229465af7"
+                        "username": "markoMark1",
+                        "distance": "6km"
                     }
                 ]
                 """;
@@ -361,17 +380,14 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             List<Statistics> statistics = statisticsDTOs.stream().map(dto -> {
                 Statistics stat = new Statistics();
-                stat.setId(UUID.fromString(dto.getId()));
                 stat.setAveragePace(dto.getAveragePace());
                 stat.setBestPace(dto.getBestPace());
                 stat.setTotalTime(dto.getTotalTime());
 
-                Users user = userRepository.findById(UUID.fromString(dto.getUserId()))
-                        .orElseThrow(() -> new RuntimeException("User not found: " + dto.getUserId()));
+                Users user = userRepository.findByUsername(dto.getUsername());
                 stat.setUser(user);
 
-                Type type = typeRepository.findById(UUID.fromString(dto.getTypeId()))
-                        .orElseThrow(() -> new RuntimeException("Type not found: " + dto.getTypeId()));
+                Type type = typeRepository.findByDistance(dto.getDistance());
                 stat.setType(type);
 
                 return stat;
@@ -387,9 +403,8 @@ public class DatabaseSeeder implements CommandLineRunner {
             String ordersJson = """
                 [
                     {
-                        "id": "d92e4437-65f0-403d-a4a0-ec95213cb6b6",
-                        "equipmentId": "8359b467-996d-4d5e-ad4b-762cfd66060e",
-                        "userId": "80d45932-cc33-41ff-af76-6a7853a5ca76"
+                        "equipmentName": "string",
+                        "username": "probaNoviAdd"
                     }
                 ]
                 """;
@@ -399,14 +414,10 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             List<Orders> orders = orderDTOs.stream().map(dto -> {
                 Orders order = new Orders();
-                order.setId(UUID.fromString(dto.getId()));
-
-                Equipment equipment = equipmentRepository.findById(UUID.fromString(dto.getEquipmentId()))
-                        .orElseThrow(() -> new RuntimeException("Equipment not found: " + dto.getEquipmentId()));
+                Equipment equipment = equipmentRepository.findByName(dto.getEquipmentName());
                 order.setEquipmentId(equipment.getId());
 
-                Users user = userRepository.findById(UUID.fromString(dto.getUserId()))
-                        .orElseThrow(() -> new RuntimeException("User not found: " + dto.getUserId()));
+                Users user = userRepository.findByUsername(dto.getUsername());
                 order.setUserId(user.getId());
 
                 return order;
@@ -422,64 +433,54 @@ public class DatabaseSeeder implements CommandLineRunner {
             String newslettersJson = """
                 [
                     {
-                        "id": "27cacc96-0e8e-4530-a073-d65ce1171902",
                         "title": "striaaa",
                         "description": "lalalalalal",
-                        "userId": "666d19e0-56ba-4865-90f9-9b229d466697"
+                        "username": "tetete"
                     },
                     {
-                        "id": "32a0f85b-9d59-48bd-b694-8e9d366ac1ee",
                         "title": "striaaa",
                         "description": "lalalalalal",
-                        "userId": "cb2e5f28-f329-45be-b47e-210dfd0dcfe4"
+                        "username": "ivanivi1"
                     },
                     {
-                        "id": "441cbc2e-fa1a-44f8-bdd5-bcaee0f760b9",
                         "title": "striaaa",
                         "description": "lalalalalal",
-                        "userId": "97ab7a35-f239-4ee4-a01c-a293e0fdbfcc"
+                        "username": "markoMark1"
                     },
                     {
-                        "id": "47facd1f-ed9d-40b5-8d1d-038457e37eb6",
                         "title": "striaaa",
                         "description": "lalalalalal",
-                        "userId": "a2b31b60-79bf-4205-9726-b8765c91f6a5"
+                        "username": "postmanUsername1"
                     },
                     {
-                        "id": "5ebcef67-d810-4507-bc2b-2718cbeab95e",
                         "title": "striaaa",
                         "description": "lalalalalal",
-                        "userId": "80d45932-cc33-41ff-af76-6a7853a5ca76"
+                        "username": "probaNoviAdd"
                     },
                     {
-                        "id": "62795c5f-591c-40e8-beb6-caa44296c806",
                         "title": "string",
                         "description": "stringstri",
-                        "userId": "5bd1e72b-0ab0-4fc0-be55-69b1b43d8bd6"
+                        "username": "stringApril"
                     },
                     {
-                        "id": "c08500dc-8892-4289-87c5-4329ba0adf6b",
                         "title": "striaaa",
                         "description": "lalalalalal",
-                        "userId": "d09c6d51-df26-4700-a31d-d3b7f85ab511"
+                        "username": "testUsername"
                     },
                     {
-                        "id": "cac409fa-c280-45d9-94ba-2d345dab00bd",
                         "title": "striaaa",
                         "description": "lalalalalal",
-                        "userId": "b126ed50-7412-48ee-a8ca-3702badfba30"
+                        "username": "emiremir1"
                     },
                     {
-                        "id": "e8b530a5-a48a-4697-965e-78f215bdaf3d",
                         "title": "striaaa",
                         "description": "lalalalalal",
-                        "userId": "8b28ff41-6133-4513-8635-b8e481b347c1"
+                        "username": "proba11010"
                     },
                     {
-                        "id": "ee1793dc-dcd6-4e35-929c-cd0fe7a0532e",
                         "title": "striaaa",
                         "description": "lalalalalal",
-                        "userId": "93ff08d4-7153-4453-b7d6-8fea6911770d"
+                        "username": "anaAnic1"
                     }
                 ]
                 """;
@@ -489,12 +490,10 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             List<Newsletter> newsletters = newsletterDTOs.stream().map(dto -> {
                 Newsletter newsletter = new Newsletter();
-                newsletter.setId(UUID.fromString(dto.getId()));
                 newsletter.setTitle(dto.getTitle());
                 newsletter.setDescription(dto.getDescription());
 
-                Users user = userRepository.findById(UUID.fromString(dto.getUserId()))
-                        .orElseThrow(() -> new RuntimeException("User not found: " + dto.getUserId()));
+                Users user = userRepository.findByUsername(dto.getUsername());
                 newsletter.setUser(user);
 
                 return newsletter;
@@ -507,20 +506,11 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     // DTO classes for deserialization
     private static class StatisticsDTO {
-        private String id;
         private double averagePace;
         private double bestPace;
         private double totalTime;
-        private String userId;
-        private String typeId;
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
+        private String username;
+        private String distance;
 
         public double getAveragePace() {
             return averagePace;
@@ -546,66 +536,48 @@ public class DatabaseSeeder implements CommandLineRunner {
             this.totalTime = totalTime;
         }
 
-        public String getUserId() {
-            return userId;
+        public String getUsername() {
+            return username;
         }
 
-        public void setUserId(String userId) {
-            this.userId = userId;
+        public void setUsername(String username) {
+            this.username = username;
         }
 
-        public String getTypeId() {
-            return typeId;
+        public String getDistance() {
+            return distance;
         }
 
-        public void setTypeId(String typeId) {
-            this.typeId = typeId;
+        public void setDistance(String distance) {
+            this.distance = distance;
         }
     }
 
     private static class OrderDTO {
-        private String id;
-        private String equipmentId;
-        private String userId;
+        private String equipmentName;
+        private String username;
 
-        public String getId() {
-            return id;
+        public String getEquipmentName() {
+            return equipmentName;
         }
 
-        public void setId(String id) {
-            this.id = id;
+        public void setEquipmentName(String equipmentName) {
+            this.equipmentName = equipmentName;
         }
 
-        public String getEquipmentId() {
-            return equipmentId;
+        public String getUsername() {
+            return username;
         }
 
-        public void setEquipmentId(String equipmentId) {
-            this.equipmentId = equipmentId;
-        }
-
-        public String getUserId() {
-            return userId;
-        }
-
-        public void setUserId(String userId) {
-            this.userId = userId;
+        public void setUsername(String username) {
+            this.username = username;
         }
     }
 
     private static class NewsletterDTO {
-        private String id;
         private String title;
         private String description;
-        private String userId;
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
+        private String username;
 
         public String getTitle() {
             return title;
@@ -623,13 +595,12 @@ public class DatabaseSeeder implements CommandLineRunner {
             this.description = description;
         }
 
-        public String getUserId() {
-            return userId;
+        public String getUsername() {
+            return username;
         }
 
-        public void setUserId(String userId) {
-            this.userId = userId;
+        public void setUsername(String username) {
+            this.username = username;
         }
     }
-
 }

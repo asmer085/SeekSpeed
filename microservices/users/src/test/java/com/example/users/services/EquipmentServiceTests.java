@@ -1,6 +1,6 @@
 package com.example.users.services;
 
-import com.example.users.dtos.EquipmentDTO;
+import com.example.users.dto.EquipmentDTO;
 import com.example.users.entity.Equipment;
 import com.example.users.mappers.EquipmentMapper;
 import com.example.users.repository.EquipmentRepository;

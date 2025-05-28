@@ -1,6 +1,6 @@
 package com.example.users.mappers;
 
-import com.example.users.dtos.StatisticsDTO;
+import com.example.users.dto.StatisticsDTO;
 import com.example.users.entity.Statistics;
 import com.example.users.entity.Type;
 import com.example.users.entity.Users;

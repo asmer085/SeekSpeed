@@ -1,6 +1,6 @@
 package com.example.users.mappers;
 
-import com.example.users.dtos.TypeDTO;
+import com.example.users.dto.TypeDTO;
 import com.example.users.entity.Type;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

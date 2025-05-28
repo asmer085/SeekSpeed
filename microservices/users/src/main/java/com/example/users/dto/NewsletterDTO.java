@@ -1,8 +1,5 @@
-package com.example.users.dtos;
+package com.example.users.dto;
 
-import com.example.users.entity.Users;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 

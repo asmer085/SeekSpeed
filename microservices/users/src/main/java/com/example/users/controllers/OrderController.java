@@ -1,9 +1,8 @@
 package com.example.users.controllers;
 
-import com.example.users.dtos.OrdersDTO;
+import com.example.users.dto.OrdersDTO;
 import com.example.users.entity.Orders;
 import com.example.users.services.OrderService;
-import com.example.users.services.UserService;
 import com.github.fge.jsonpatch.JsonPatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

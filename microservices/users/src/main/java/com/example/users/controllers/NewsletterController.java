@@ -1,9 +1,8 @@
 package com.example.users.controllers;
 
-import com.example.users.dtos.NewsletterDTO;
+import com.example.users.dto.NewsletterDTO;
 import com.example.users.entity.Newsletter;
 import com.example.users.services.NewsletterService;
-import com.example.users.services.UserService;
 import com.github.fge.jsonpatch.JsonPatch;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

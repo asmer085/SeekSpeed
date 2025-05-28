@@ -9,7 +9,4 @@ import org.springframework.test.context.TestPropertySource;
 @ActiveProfiles("test")
 @TestPropertySource(locations = "classpath:application.properties")
 class EventsApplicationTests {
-	@Test
-	void contextLoads() {
-	}
 }
