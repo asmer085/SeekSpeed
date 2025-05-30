@@ -13,6 +13,7 @@ public class EventUserDTO implements Serializable {
     private String emailAddress;
     private String picture;
     private String dateOfBirth;
+    private String role;
     private String gender;
     private String country;
     private String tShirtSize;
@@ -22,7 +23,7 @@ public class EventUserDTO implements Serializable {
     }
 
     public EventUserDTO(String firstName, String lastName, String username,
-                        String emailAddress, String picture, String dateOfBirth,
+                        String emailAddress, String picture, String dateOfBirth, String role,
                         String gender, String country, String tShirtSize, UUID id) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -30,6 +31,7 @@ public class EventUserDTO implements Serializable {
         this.emailAddress = emailAddress;
         this.picture = picture;
         this.dateOfBirth = dateOfBirth;
+        this.role = role;
         this.gender = gender;
         this.country = country;
         this.tShirtSize = tShirtSize;
@@ -116,6 +118,14 @@ public class EventUserDTO implements Serializable {
         this.picture = picture;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     @Override
     public String toString() {
         return "EventUserDTO{" +
@@ -125,6 +135,7 @@ public class EventUserDTO implements Serializable {
                 ", emailAddress='" + emailAddress + '\'' +
                 ", picture='" + picture + '\'' +
                 ", dateOfBirth='" + dateOfBirth + '\'' +
+                ", role='" + role + '\'' +
                 ", gender='" + gender + '\'' +
                 ", country='" + country + '\'' +
                 ", tShirtSize='" + tShirtSize + '\'' +

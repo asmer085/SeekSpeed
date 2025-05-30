@@ -22,8 +22,7 @@ public class EventUserDTO implements Serializable {
     }
 
     public EventUserDTO(String firstName, String lastName, String username,
-                        String emailAddress, String picture, String dateOfBirth,
-                        String role,
+                        String emailAddress, String picture, String dateOfBirth, String role,
                         String gender, String country, String tShirtSize, UUID id) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -86,6 +85,14 @@ public class EventUserDTO implements Serializable {
         this.dateOfBirth = dateOfBirth;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     public String getGender() {
         return this.gender;
     }
@@ -117,10 +124,6 @@ public class EventUserDTO implements Serializable {
     public void setPicture(String picture) {
         this.picture = picture;
     }
-
-    public String getRole() {return this.role;}
-
-    public void setRole(String role) {this.role = role;}
 
     @Override
     public String toString() {

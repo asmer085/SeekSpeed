@@ -46,6 +46,7 @@ public class Listener {
                 user.setEmailAddress(userDto.getEmailAddress());
                 user.setPicture(userDto.getPicture());
                 user.setDateOfBirth(userDto.getDateOfBirth());
+                user.setRole(userDto.getRole());
                 user.setGender(userDto.getGender());
                 user.setCountry(userDto.getCountry());
                 user.setTShirtSize(userDto.getTShirtSize());

@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -15,6 +16,9 @@
         <module name="events" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="shared" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
@@ -24,6 +28,7 @@
       <module name="eureka-users" options="-parameters" />
       <module name="eurekaserver" options="-parameters" />
       <module name="events" options="-parameters" />
+      <module name="shared" options="" />
       <module name="users" options="-parameters" />
     </option>
   </component>

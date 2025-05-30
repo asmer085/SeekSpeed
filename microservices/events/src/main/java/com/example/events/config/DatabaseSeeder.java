@@ -3,7 +3,7 @@ package com.example.events.config;
 import com.example.events.dto.UserTypeDTO;
 import com.example.events.entity.Event;
 import com.example.events.entity.Review;
-import com.example.events.entity.Type;
+import com.example.events.entity.Types;
 import com.example.events.entity.User;
 import com.example.events.messaging.Listener;
 import com.example.events.repository.EventRepository;
@@ -96,7 +96,7 @@ public class DatabaseSeeder implements CommandLineRunner {
     }
 
     private void sendTypesToUsersService() {
-        List<Type> types = typeRepository.findAll();
+        List<Types> types = typeRepository.findAll();
         List<UserTypeDTO> usersType = types.stream()
                 .map(type -> new UserTypeDTO(
                         type.getDistance(),
@@ -114,7 +114,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                             return message;
                         }
         );
-        System.out.println("****Type data sent to Users service****");
+        System.out.println("****Types data sent to Users service****");
     }
     private void seedTypes() {
         if (typeRepository.count() == 0) {
@@ -135,17 +135,17 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .findFirst()
                     .orElseThrow();
 
-            List<Type> types = List.of(
+            List<Types> types = List.of(
                     // Running event types
-                    new Type(25.0, "5km", "Individual results", runningEvent),
-                    new Type(40.0, "10km", "Individual results", runningEvent),
+                    new Types(25.0, "5km", "Individual results", runningEvent),
+                    new Types(40.0, "10km", "Individual results", runningEvent),
 
                     // Cycling event types
-                    new Type(30.0, "6km", "Team results", cyclingEvent),
-                    new Type(50.0, "12km", "Team results", cyclingEvent),
+                    new Types(30.0, "6km", "Team results", cyclingEvent),
+                    new Types(50.0, "12km", "Team results", cyclingEvent),
 
                     // Hiking event type
-                    new Type(15.0, "8km", "Group participation", hikingEvent)
+                    new Types(15.0, "8km", "Group participation", hikingEvent)
             );
 
             typeRepository.saveAll(types);

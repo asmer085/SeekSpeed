@@ -60,6 +60,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                         user.getEmailAddress(),
                         user.getPicture(),
                         user.getDateOfBirth(),
+                        user.getRole(),
                         user.getGender(),
                         user.getCountry(),
                         user.getTShirtSize(),

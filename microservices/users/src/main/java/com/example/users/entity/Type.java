@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import java.util.UUID;
 
 @Entity
+@Table(name = "type")
 public class Type {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

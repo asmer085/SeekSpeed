@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "app_user")
+@Table(name = "user")
 public class User {
     @Id
     private UUID id;
