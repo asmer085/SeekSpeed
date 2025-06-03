@@ -21,17 +21,6 @@ public class Listener {
         this.typeRepository = typeRepository;
     }
 
-    /*@RabbitListener(queues = "user.update.queue")
-    public void receiveUserUpdate(UserUpdateEventDTO userDTO) {
-        try {
-            String json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(userDTO);
-            System.out.println("Primljena poruka:");
-            System.out.println(json);
-        } catch (Exception e) {
-            System.err.println("Greška prilikom konverzije u JSON: " + e.getMessage());
-        }
-    }*/
-
     @RabbitListener(queues = RabbitMQConfig.TYPE_RECEIVE_QUEUE)
     public void receiveTypes(List<Map<String, Object>> typesMap) {
         try {

@@ -5,6 +5,7 @@ import com.example.events.entity.Types;
 import com.example.events.service.TypeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,9 +32,9 @@ public class TypeController {
         return typeService.getTypesByEventId(eventId);
     }
 
-    @PutMapping("/batch")
-    public List<Types> updateTypes(@RequestBody List<TypeDTO> typeDTOs) {
-        return typeService.updateTypes(typeDTOs);
+    @PutMapping("/{typeId}")
+    public @ResponseBody ResponseEntity<Types> updateType(@PathVariable UUID typeId, @Valid @RequestBody TypeDTO typeDTO) {
+        return typeService.updateType(typeId, typeDTO);
     }
 
     @GetMapping("/byDistance")

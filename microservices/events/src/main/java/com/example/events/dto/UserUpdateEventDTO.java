@@ -1,4 +1,4 @@
-package com.example.users.dto;
+package com.example.events.dto;
 
 import java.io.Serializable;
 import java.util.UUID;

@@ -11,7 +11,7 @@ public class UserTypeDTO implements Serializable {
     private UUID typeId;
     private Double price;
 
-    UserTypeDTO() {}
+    public UserTypeDTO() {}
 
     public UserTypeDTO(String distance,
                        String results,

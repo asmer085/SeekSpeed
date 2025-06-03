@@ -1,6 +1,7 @@
 
 package com.example.users.services;
 
+import com.example.users.config.RabbitMQConfig;
 import com.example.users.dto.UserDTO;
 import com.example.users.dto.UserUpdateEventDTO;
 import com.example.users.entity.Users;
@@ -15,6 +16,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,12 @@ public class UserService implements UserDetailsService{
 
     @Autowired
     private Validator validator;
+
+    private final RabbitTemplate rabbitTemplate;
+
+    public UserService(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
+    }
 
     public Iterable<Users> getAllUsers() {
         return userRepository.findAll();
@@ -82,16 +90,21 @@ public class UserService implements UserDetailsService{
                 savedUser.getId(),
                 savedUser.getFirstName(),
                 savedUser.getLastName(),
+                savedUser.getUsername(),
                 savedUser.getEmailAddress(),
                 savedUser.getRole(),
                 savedUser.getDateOfBirth(),
                 savedUser.getGender(),
                 savedUser.getTShirtSize(),
                 savedUser.getCountry(),
-                savedUser.getPicture(),
-                "CREATE"
+                savedUser.getPicture()
         );
-        //userEventPublisher.sendUserUpdate(userEvent);
+
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.USER_POST_EXCHANGE,
+                RabbitMQConfig.USER_POST_ROUTING_KEY,
+                userEvent
+        );
         return userMapper.usersToUserDTO(savedUser);
     }
 
@@ -111,24 +124,35 @@ public class UserService implements UserDetailsService{
             users.add(user);
         }
 
-        Iterable<Users> savedUsers = userRepository.saveAll(users);
+        userRepository.saveAll(users);
+
         // Sending message through RabbitMQ for events service
+        List<UserUpdateEventDTO> message = new ArrayList<>();
         for (Users user : users) {
             UserUpdateEventDTO event = new UserUpdateEventDTO(
                     user.getId(),
                     user.getFirstName(),
                     user.getLastName(),
+                    user.getUsername(),
                     user.getEmailAddress(),
                     user.getRole(),
                     user.getDateOfBirth(),
                     user.getGender(),
                     user.getTShirtSize(),
                     user.getCountry(),
-                    user.getPicture(),
-                    "BATCH"
+                    user.getPicture()
             );
-            //userEventPublisher.sendUserUpdate(event);
+            message.add(event);
         }
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.USER_EXCHANGE,
+                RabbitMQConfig.USER_ROUTING_KEY,
+                message,
+                message1 -> {
+                    message1.getMessageProperties().getHeaders().put("__TypeId__", "java.util.List");
+                    return message1;
+                }
+        );
 
         return users.stream()
                 .map(userMapper::usersToUserDTO)
@@ -159,16 +183,20 @@ public class UserService implements UserDetailsService{
                             saved.getId(),
                             saved.getFirstName(),
                             saved.getLastName(),
+                            saved.getUsername(),
                             saved.getEmailAddress(),
                             saved.getRole(),
                             saved.getDateOfBirth(),
                             saved.getGender(),
                             saved.getTShirtSize(),
                             saved.getCountry(),
-                            saved.getPicture(),
-                            "PUT"
+                            saved.getPicture()
                     );
-                    //userEventPublisher.sendUserUpdate(event);
+                    rabbitTemplate.convertAndSend(
+                            RabbitMQConfig.USER_UPDATE_EXCHANGE,
+                            RabbitMQConfig.USER_UPDATE_ROUTING_KEY,
+                            event
+                    );
 
                     return ResponseEntity.ok(saved);
                 })
@@ -198,16 +226,20 @@ public class UserService implements UserDetailsService{
                     patchedUser.getId(),
                     patchedUser.getFirstName(),
                     patchedUser.getLastName(),
+                    patchedUser.getUsername(),
                     patchedUser.getEmailAddress(),
                     patchedUser.getRole(),
                     patchedUser.getDateOfBirth(),
                     patchedUser.getGender(),
                     patchedUser.getTShirtSize(),
                     patchedUser.getCountry(),
-                    patchedUser.getPicture(),
-                    "PATCH"
+                    patchedUser.getPicture()
             );
-            //userEventPublisher.sendUserUpdate(userUpdateEventDTO);
+            rabbitTemplate.convertAndSend(
+                    RabbitMQConfig.USER_UPDATE_EXCHANGE,
+                    RabbitMQConfig.USER_UPDATE_ROUTING_KEY,
+                    userUpdateEventDTO
+            );
 
             return userRepository.save(patchedUser);
         } catch (JsonPatchException | JsonProcessingException e) {
@@ -225,16 +257,20 @@ public class UserService implements UserDetailsService{
                             user.getId(),
                             user.getFirstName(),
                             user.getLastName(),
+                            user.getUsername(),
                             user.getEmailAddress(),
                             user.getRole(),
                             user.getDateOfBirth(),
                             user.getGender(),
                             user.getTShirtSize(),
                             user.getCountry(),
-                            user.getPicture(),
-                            "DELETE"
+                            user.getPicture()
                     );
-                    //userEventPublisher.sendUserUpdate(event);
+                    rabbitTemplate.convertAndSend(
+                            RabbitMQConfig.USER_DELETE_EXCHANGE,
+                            RabbitMQConfig.USER_DELETE_ROUTING_KEY,
+                            event
+                    );
 
                     return ResponseEntity.ok().build();
                 })
