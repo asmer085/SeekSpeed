@@ -56,6 +56,7 @@ public class Listener {
     @Transactional
     public void receiveCreateUser(UserUpdateEventDTO message) {
         User user = new User();
+        user.setId(UUID.randomUUID());
         user.setUserId(message.getUserId());
         user.setFirstName(message.getFirstName());
         user.setLastName(message.getLastName());
@@ -76,6 +77,7 @@ public class Listener {
     public void receiveUserBatch(List<UserUpdateEventDTO> users) {
         for (UserUpdateEventDTO message : users) {
             User user = new User();
+            user.setId(UUID.randomUUID());
             user.setUserId(message.getUserId());
             user.setFirstName(message.getFirstName());
             user.setLastName(message.getLastName());

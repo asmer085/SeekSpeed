@@ -1,5 +1,7 @@
 package com.example.events.service;
 
+import com.example.events.client.UserClient;
+import com.example.events.dto.UserEventDTO;
 import com.example.events.entity.User;
 import com.example.events.exception.ResourceNotFoundException;
 import com.example.events.repository.UserEventRepository;
@@ -20,6 +22,8 @@ public class UserEventService {
     private final UserEventRepository userEventRepository;
     @Autowired
     private final UserRepository userRepository;
+    @Autowired
+    private final UserClient userServiceClient;
 
     @Transactional(readOnly = true)
     public List<UUID> getEventIdsByUserId(UUID userId) {
@@ -30,5 +34,20 @@ public class UserEventService {
                 .map(userEvent -> userEvent.getEvent().getId())
                 .toList();
     }
+
+    @Transactional
+    public void syncAllUserEventsToUsersService() {
+        List<User> allUsers = (List<User>) userRepository.findAll();
+
+        for (User user : allUsers) {
+            List<UUID> eventIds = getEventIdsByUserId(user.getId());
+
+            for (UUID eventId : eventIds) {
+                UserEventDTO dto = new UserEventDTO(user.getId(), eventId);
+                userServiceClient.sendUserEvent(dto);
+            }
+        }
+    }
+
 }
 

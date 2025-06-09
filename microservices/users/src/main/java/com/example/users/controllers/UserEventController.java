@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api/user-events")
 public class UserEventController {
 
     @Autowired
@@ -27,6 +28,11 @@ public class UserEventController {
     public @ResponseBody ResponseEntity<UserEventDTO> createUserEvent(@RequestBody UserEventDTO userEvent) {
         UserEventDTO createdUserEvent = userEventService.createUserEvent(userEvent);
         return ResponseEntity.ok(createdUserEvent);
+    }
+
+    @PostMapping
+    public void receiveUserEvent(@RequestBody UserEventDTO dto) {
+        userEventService.saveUserEvent(dto);
     }
 
 }

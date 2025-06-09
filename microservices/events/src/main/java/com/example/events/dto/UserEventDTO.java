@@ -1,6 +1,8 @@
-package com.example.users.dto;
+package com.example.events.dto;
 
-import com.example.users.entity.Users;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 

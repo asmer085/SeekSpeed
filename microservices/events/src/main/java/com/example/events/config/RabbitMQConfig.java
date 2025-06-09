@@ -50,7 +50,7 @@ public class RabbitMQConfig {
     public static final String TYPE_UPDATE_ROUTING_KEY = "type.update.routing.key";
 
     public static final String TYPE_POST_EXCHANGE = "type.create.exchange";
-    public static final String TYPE_POST_QUEUE = "type.crate.queue";
+    public static final String TYPE_POST_QUEUE = "type.create.queue";
     public static final String TYPE_POST_ROUTING_KEY = "type.create.routing.key";
 
     // Configuration for updating users data to Events service

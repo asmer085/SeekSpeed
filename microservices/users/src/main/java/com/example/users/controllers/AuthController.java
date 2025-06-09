@@ -1,8 +1,10 @@
 package com.example.users.controllers;
 
+import com.example.users.config.RabbitMQConfig;
 import com.example.users.dto.LoginDTO;
 import com.example.users.dto.TokenRefreshRequest;
 import com.example.users.dto.UserDTO;
+import com.example.users.dto.UserUpdateEventDTO;
 import com.example.users.entity.Users;
 import com.example.users.mappers.UserMapper;
 import com.example.users.repository.UserRepository;
@@ -10,6 +12,7 @@ import com.example.users.security.JwtUtil;
 
 import com.example.users.services.JwtBlacklistService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
@@ -36,6 +39,12 @@ public class AuthController {
     private UserMapper userMapper;
     @Autowired
     private JwtBlacklistService blacklistService;
+
+    private final RabbitTemplate rabbitTemplate;
+
+    public AuthController(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
+    }
 
 
     @PostMapping("/signin")
@@ -76,6 +85,28 @@ public class AuthController {
 
         Users user2 = userMapper.userDTOToUsers(user);
         userRepository.save(user2);
+
+        // Sending message through RabbitMQ for events service
+        UserUpdateEventDTO userEvent = new UserUpdateEventDTO(
+                user2.getId(),
+                user2.getFirstName(),
+                user2.getLastName(),
+                user2.getUsername(),
+                user2.getEmailAddress(),
+                user2.getRole(),
+                user2.getDateOfBirth(),
+                user2.getGender(),
+                user2.getTShirtSize(),
+                user2.getCountry(),
+                user2.getPicture()
+        );
+
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.USER_POST_EXCHANGE,
+                RabbitMQConfig.USER_POST_ROUTING_KEY,
+                userEvent
+        );
+        
         return "User created successfully!";
     }
 

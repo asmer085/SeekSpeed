@@ -25,20 +25,31 @@ public class UserEventService {
 
     public UserEventDTO createUserEvent(UserEventDTO userEventDTO) {
 
-        UUID userId = userEventDTO.getUser().getId();
+        UUID userId = userEventDTO.getUserId();
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserService.UserNotFoundException("User with id " + userId + " not found"));
 
         UserEvent userEvent = new UserEvent();
         userEvent.setUser(user);
-        userEvent.setEventID(userEventDTO.getEventID());
+        userEvent.setEventID(userEventDTO.getEventId());
 
         UserEvent savedEvent = userEventRepository.save(userEvent);
 
         UserEventDTO responseDTO = new UserEventDTO();
-        responseDTO.setEventID(savedEvent.getEventID());
-        responseDTO.setUser(savedEvent.getUser());
+        responseDTO.setEventId(savedEvent.getEventID());
+        responseDTO.setUserId(savedEvent.getUser().getId());
 
         return responseDTO;
+    }
+
+    public void saveUserEvent(UserEventDTO dto) {
+        Users user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found: " + dto.getUserId()));
+
+        UserEvent userEvent = new UserEvent();
+        userEvent.setUser(user);
+        userEvent.setEventID(dto.getEventId());
+
+        userEventRepository.save(userEvent);
     }
 }
